@@ -103,7 +103,7 @@ jobs:
           pip install .
       - name: Install import module database
         run: |
-          geonature upgrade-modules-db PERMISSION_REQUESTS
+          geonature upgrade-modules-db DEMOS
         env:
           GEONATURE_CONFIG_FILE: dependencies/GeoNature/config/test_config.toml
       - name: Test with pytest
