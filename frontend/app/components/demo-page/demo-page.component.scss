@@ -1,0 +1,67 @@
+.DemoPage {
+  border: 2px solid coral;
+  padding: 12px;
+}
+
+.DemoPage__status {
+  border: 1px dashed #6b6b6b;
+  margin-bottom: 12px;
+  padding: 12px;
+}
+
+.DemoPage__status.is-loaded {
+  background: #f0fff4;
+}
+
+.DemoPage__status.is-empty {
+  background: #fff5f5;
+}
+
+.DemoPage__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.DemoPage__card {
+  border: 1px solid #d3d3d3;
+  padding: 8px;
+  background: #ffffff;
+}
+
+.DemoPage__label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #555555;
+}
+
+.DemoPage__value {
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.DemoPage__switch {
+  border: 2px solid #999999;
+  padding: 8px;
+  margin-bottom: 12px;
+}
+
+.DemoPage__steps {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.DemoPage__steps li {
+  border: 1px solid #c0c0c0;
+  padding: 4px 8px;
+}
+
+.DemoPage__steps li.is-active {
+  background: #f3f0ff;
+  border-color: #7a5af8;
+}

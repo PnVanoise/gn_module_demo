@@ -1,0 +1,38 @@
+<div class="DemoPage">
+  <section class="DemoPage__status" [ngClass]="{ 'is-loaded': demo, 'is-empty': !demo }">
+    <!-- <h3>Route + API demo</h3>
+    <div class="DemoPage__grid">
+      <div class="DemoPage__card">
+        <div class="DemoPage__label">route snapshot (sync)</div>
+        <div class="DemoPage__value">{{ routeIdSnapshot }}</div>
+      </div>
+      <div class="DemoPage__card">
+        <div class="DemoPage__label">route params$ (async)</div>
+        <div class="DemoPage__value">{{ routeIdParams$ | async }}</div>
+      </div>
+      <div class="DemoPage__card">
+        <div class="DemoPage__label">demo$ (async)</div>
+        <div class="DemoPage__value">{{ (demo$ | async)?.id_demo }}</div>
+      </div>
+      <div class="DemoPage__card">
+        <div class="DemoPage__label">demo (subscription)</div>
+        <div class="DemoPage__value">{{ demo?.id_demo }}</div>
+      </div>
+    </div>
+    <div
+      class="DemoPage__switch"
+      [ngStyle]="{ 'border-color': demo ? '#2d9c3c' : '#c74848' }"
+      [ngSwitch]="demo ? 'loaded' : 'empty'"
+    >
+      <span *ngSwitchCase="'loaded'">state: loaded</span>
+      <span *ngSwitchDefault>state: empty</span>
+    </div>
+    <ul class="DemoPage__steps">
+      <li *ngFor="let step of statusSteps; let i = index" [ngClass]="{ 'is-active': i === 1 }">
+        {{ step }}
+      </li>
+    </ul>
+  -->
+  </section>
+  <pnx-demo [demo]="demo"></pnx-demo>
+</div>

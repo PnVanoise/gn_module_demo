@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools_scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gn_module_demo"
+dynamic = ["version"]
+description = "Module GeoNature de demo"
+readme = { file = "README.md", content-type = "text/markdown" }
+maintainers = [
+  { name = "Natural Solutions", email = "geonature@natural-solutions.eu" },
+]
+license = { file = "LICENSE.txt" }
+dependencies = ["geonature >= 2.14"]
+urls = { Repository = "https://github.com/PnX-SI/gn_module_demo/" }
+requires-python = ">=3.9"
+
+[project.entry-points.gn_module]
+code = "gn_module_demo:MODULE_CODE"
+label = "gn_module_demo:MODULE_LABEL"
+picto = "gn_module_demo:MODULE_PICTO"
+blueprint = "gn_module_demo.blueprint:blueprint"
+config_schema = "gn_module_demo.conf_schema:GnModuleSchemaConf"
+migrations = "gn_module_demo:migrations"
+alembic_branch = "gn_module_demo:ALEMBIC_BRANCH"
+
+[tool.setuptools]
+package-dir = { "" = "backend" }
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+
+[tool.setuptools.package-data]
+"gn_module_demo" = ["templates/**", "static/**"]
+"gn_module_demo.migrations" = ["data/*.sql"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["backend"]
+
+[tool.coverage.run]
+source = ["gn_module_demo"]
+omit = ["*/tests/*", "*/migrations/*"]
+
+[tool.black]
+line-length = 99
+exclude = '''
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | node_modules
+    | venv
+    | dependencies
+  )/
+)
+'''
