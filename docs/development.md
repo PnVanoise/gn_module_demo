@@ -2,6 +2,58 @@
 
 L'idée de cette doc est de servir de mémo, de lister différentes astuces ...
 
+## Git / github
+
+### `git stash`
+
+Permet de sauvegarder temporairement les modifications si l'on ne souhaite pas tout de suite les ajouter à un `commit`.
+
+Exemple, je suis sur la branche feat/feat-3 et je souhaite faire un fetch sur ma branche develop sans ajouter mes dernières modifs à un comit et sans les perdre :
+
+```shell
+git stash
+git checkout develop
+git fetch github-pnv
+git pull
+git checkout feat/demoCynt
+```
+
+Pour récupérer les dernières modificaions stockées dans le stash :
+
+```shell
+git stash pop
+```
+
+### Associer une branche à un dépôt distant
+
+Afin de ne pas avoir à systématiquement spécifier le dépôt distant concerné par les commandes `git fetch`, `git pull`, `git push`, il est possible d'associer à une branche un dépôt distant par défaut avec la commande :
+
+```shell
+git branch -u github-pnv/develop develop
+```
+
+l'option `-u <upstream>` est un racoursi de l'option `--set-upstream-to=<upstream>`
+Dans cet exemple on paramètre la brache develop pour suivre la branche 'github-pnv/develop'
+
+### Retirer des fichiers du commit
+
+Vous souhaitez par exemple retirer des fichiers nouvellement créés que vous avez malencontreusement ajouté avec la commande `git add`. Ne faites pas encore de commit !
+
+```shell
+git restore --staged . 
+```
+
+Cette commande retire tous les fichiers ajoutés, pour spécifier un fichier en particulier il faut le préciser à l'option `-staged` à la place du '.'.
+
+Vous pourez ensuite si vous le souhaitez rajouter ces fichier au `.gitignore`. Le `git status` ne devrait alors plus les mentionner.
+
+Vous pouvez ensuite rajouter les fichier voulus au commit et créé votre commit.
+
+```shell
+git add <file>
+git commit -m <message>
+```
+
 ## Backend
 
 ### Logs

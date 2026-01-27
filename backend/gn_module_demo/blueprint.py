@@ -2,13 +2,13 @@
 Définition des routes du module export
 """
 
-import logging
-from geonature.contrib.gn_module_validation.backend.gn_module_validation import schema
+# import logging
+
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import joinedload
 
-from flask import Blueprint
-from werkzeug.exceptions import NotFound
+from flask import Blueprint, request
+from werkzeug.exceptions import NotFound, BadRequest
 
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.decorators import login_required
@@ -20,12 +20,14 @@ from .models import Demo, Individual
 from apptax.taxonomie.models import Taxref
 from .schemas import IndividualSchema
 
-logger = logging.getLogger(__name__)
+# A utiliser pour stocker les logs dans le fichier de log
+# logger = logging.getLogger(__name__)
 blueprint = Blueprint("demo", __name__, cli_group="demo")
 
 ## ########################################################################
 ## COLLECTION
 ## ########################################################################
+
 
 @blueprint.route("/", methods=["GET"])
 @login_required
@@ -36,65 +38,93 @@ def list_demos():
     demos = db.session.execute(query).scalars().all()
     return [{"id_demo": demo.id_demo} for demo in demos]
 
+
 ## ########################################################################
 ## ENTITY - GET
 ## ########################################################################
+
 
 @blueprint.route("/<int(signed=True):id_demo>", methods=["GET"])
 @login_required
 @json_resp
 def demo(id_demo):
     query = db.select(Demo)
-    demo = (
-        db.session.scalars(query.filter_by(id_demo=id_demo))
-        .unique()
-        .one_or_none()
-    )
+    demo = db.session.scalars(query.filter_by(id_demo=id_demo)).unique().one_or_none()
     if demo is None:
         raise NotFound(f"Demo {id_demo} not found")
     return {"id_demo": demo.id_demo}
 
-# ########################################################################
-# Sans sérialiser marshmallow
-# 
-# @blueprint.route("/indiv", methods=["GET"])
-# @login_required
-# @json_resp
-# def indiv():
-#     query = db.select(
-#                 Individual.id_individual,
-#                 Individual.name,
-#                 Taxref.nom_complet
-#             ).select_from(Individual).join(Taxref, Individual.cd_nom == Taxref.cd_nom)
-#     # sql = query.compile(
-#     #     dialect=postgresql.dialect(),
-#     #         compile_kwargs={"literal_binds": True},
-#     # )
-#     # logger.info("SQL: %s", sql)
-
-#     indivs = db.session.execute(query).all()
-#     logger.info(f"------- indivs log: {indivs}")
-
-#     return [{"id_individual": indiv.id_individual, "name": indiv.name, "nom_complet": indiv.nom_complet} for indiv in indivs]
 
 # ########################################################################
 # Avec sérialiseur marshmallow
-# 
+#
 @blueprint.route("/indiv", methods=["GET"])
 @login_required
 @json_resp
-def indiv():
+def list_indiv():
     # Un schéma doit être créé
-    schema = IndividualSchema()
+    schema = IndividualSchema(many=True, only=["taxref"])
 
     query = db.select(Individual).options(joinedload(Individual.taxref))
-    # sql = query.compile(
-    #     dialect=postgresql.dialect(),
-    #         compile_kwargs={"literal_binds": True},
-    # )
-    # logger.info("SQL: %s", sql)
-   
-    indivs = db.session.execute(query).all()
-    logger.info(f"------- indivs log: {indivs}")
 
-    return schema.dump(indivs, many=True)
+    # Passer la requête en chaîne de caractères pour les logs
+    sql = query.compile(
+        dialect=postgresql.dialect(),
+        compile_kwargs={"literal_binds": True},
+    )
+
+    print(f"-- DEBUG ------- {sql}")
+
+    indivs = db.session.execute(query).scalars().all()
+
+    print(f"-- DEBUG ------- indivs[n] type : {type(indivs[0])}")
+    print(f"-- DEBUG ------- indivs log: {indivs}")
+    print(f"-- DEBUG ------- tous les indivs: {vars(indivs[0].taxref)}")
+
+    return schema.dump(indivs)
+
+
+@blueprint.route("/indiv/<int(signed=True):id_individual>", methods=["GET"])
+@login_required
+@json_resp
+def indiv(id_individual):
+    # Un schéma doit être créé
+    schema = IndividualSchema(many=True)
+
+    query = (
+        db.select(Individual)
+        .options(joinedload(Individual.taxref))
+        .filter_by(id_individual=id_individual)
+    )
+
+    # Passer la requête en chaîne de caractères pour les logs
+    sql = query.compile(
+        dialect=postgresql.dialect(),
+        compile_kwargs={"literal_binds": True},
+    )
+
+    # A utiliser pour stocker les logs dans le fichier de log
+    print(f"-- DEBUG ------- {sql}")
+
+    indivs = db.session.execute(query).one_or_none()
+
+    print(f"-- DEBUG ------- indivs log: {indivs}")
+
+    return schema.dump(indivs)
+
+
+@blueprint.route("/indiv", methods=["POST"])
+@login_required
+@json_resp
+def create_indiv():
+    payload = request.get_json(silent=True)
+
+    if payload is None:
+        raise BadRequest("JSON body is required")
+
+    schema = IndividualSchema()
+    individual = schema.load(payload)
+    print(f"-- DEBUG ------- individual log: {individual}")
+    db.session.add(individual)
+    db.session.commit()
+    return schema.dump(individual)
