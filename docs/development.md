@@ -51,7 +51,8 @@ class Individual(DB.Model):
 
 #### Sans marshmallow
 
-> [!WARNING] A ne plus utiliser : Méthode dépréciée pour GeoNature, seule la sérialisation avec marshmallow est acceptée !**
+> [!WARNING]
+> A ne plus utiliser : Méthode dépréciée pour GeoNature, seule la sérialisation avec marshmallow est acceptée !**
 
 ```python
 @blueprint.route("/indiv", methods=["GET"])
