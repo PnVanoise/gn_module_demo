@@ -1,0 +1,67 @@
+from sqlalchemy import func
+from sqlalchemy.orm import joinedload, selectinload
+
+from apptax.taxonomie.models import Taxref
+from geonature.utils.env import db
+
+from .models import Individuals
+
+
+def list_individuals_with_taxref(load_strategy="joined"):
+    query = db.select(Individuals)
+    if load_strategy == "joined":
+        query = query.options(joinedload(Individuals.taxref))
+    elif load_strategy == "selectin":
+        query = query.options(selectinload(Individuals.taxref))
+    return db.session.scalars(query).unique().all()
+
+
+def list_individuals_projection():
+    query = db.select(Individuals.id_individual, Individuals.name_individual)
+    return db.session.execute(query).all()
+
+
+def list_individuals_csv_rows():
+    query = db.select(
+        Individuals.id_individual,
+        Individuals.name_individual,
+        Individuals.cd_nom,
+    )
+    return db.session.execute(query).all()
+
+
+def count_individuals_by_taxref():
+    count_label = func.count(Individuals.id_individual).label("count")
+    query = (
+        db.select(Individuals.cd_nom, count_label)
+        .group_by(Individuals.cd_nom)
+        .order_by(count_label.desc())
+    )
+    return db.session.execute(query).all()
+
+
+def search_taxref_autocomplete(query_text, limit=10):
+    if not query_text:
+        return []
+    query = (
+        db.select(Taxref.cd_nom, Taxref.nom_complet)
+        .where(Taxref.nom_complet.ilike(f"%{query_text}%"))
+        .order_by(Taxref.nom_complet.asc())
+        .limit(limit)
+    )
+    return db.session.execute(query).all()
+
+
+def create_individual(individual):
+    db.session.add(individual)
+    db.session.commit()
+    return individual
+
+
+def update_individual():
+    db.session.commit()
+
+
+def delete_individual(individual):
+    db.session.delete(individual)
+    db.session.commit()
