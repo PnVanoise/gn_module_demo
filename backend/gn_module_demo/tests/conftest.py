@@ -4,11 +4,24 @@ from sqlalchemy import select
 from geonature.tests.fixtures import *
 from geonature.tests.fixtures import _session, app, _app, users
 from geonature.tests.test_permissions import g_permissions
+from geonature.utils.config import config as gn_config
 from geonature.utils.env import db
 from geonature.core.gn_commons.models import TModules
 from geonature.core.gn_permissions.models import PermAction, PermObject, Permission
 
 from gn_module_demo import MODULE_CODE, MODULE_LABEL, MODULE_PICTO
+from gn_module_demo.blueprint import blueprint as demo_blueprint
+
+
+@pytest.fixture
+def client(app):
+    if "demo.list_demos" not in app.view_functions:
+        module_config = gn_config.get(MODULE_CODE, {})
+        url_prefix = module_config.get("MODULE_API", "/demo")
+        if not url_prefix.startswith("/"):
+            url_prefix = f"/{url_prefix}"
+        app.register_blueprint(demo_blueprint, url_prefix=url_prefix)
+    return app.test_client()
 
 
 @pytest.fixture(scope="session", autouse=True)
