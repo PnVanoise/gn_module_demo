@@ -1,6 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GN2CommonModule } from '@geonature_common/GN2Common.module';
+import { RouterModule } from '@angular/router';
 
 import { Demo } from '../../models/demo';
 import { DemoComponent } from '../demo/demo.component';
@@ -13,6 +14,7 @@ import { DemoService } from '../../services/demo.service';
   imports: [
     GN2CommonModule,
     CommonModule,
+    RouterModule,
     DemoComponent
   ],
 })

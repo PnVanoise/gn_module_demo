@@ -6,18 +6,20 @@ jobs:
   backend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Backend code formatting check (Black)
         uses: psf/black@stable
         with:
-          src: "setup.py ./backend/gn_module_demo"
+          src: "./backend/gn_module_demo"
   frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - name: Frontend code formatting check (Prettier)
-        run: npm install prettier && npm run format:check
+        run: npm ci && npm run format:check
         working-directory: ./frontend
