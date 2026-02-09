@@ -31,6 +31,16 @@ def test_create_individual_requires_json(admin_client):
 
 
 @pytest.mark.integration
+def test_create_individual_rejects_id_in_payload(admin_client, individual_payload):
+    payload = dict(individual_payload)
+    payload["id_individual"] = 1234
+
+    response = admin_client.post(url_for("demo.create_individual"), json=payload)
+
+    assert response.status_code == 400
+
+
+@pytest.mark.integration
 def test_create_update_delete_individual_flow(admin_client, individual_payload):
     response = admin_client.post(url_for("demo.create_individual"), json=individual_payload)
 

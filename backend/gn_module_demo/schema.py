@@ -7,7 +7,6 @@ from marshmallow import Schema, ValidationError, fields, validates
 from apptax.taxonomie.models import Taxref
 from apptax.taxonomie.schemas import TaxrefSchema
 from geonature.utils.env import db, ma
-from utils_flask_sqla.schema import SmartRelationshipsMixin
 
 from .models import Individuals
 
@@ -21,13 +20,15 @@ demo_list_schema = DemoSchema(many=True)
 ADDITIONAL_DATA_MANDATORY = ["age", "sex"]
 
 
-class IndividualsSchema(SmartRelationshipsMixin, ma.SQLAlchemyAutoSchema):
+class IndividualsSchema(ma.SQLAlchemyAutoSchema):
+    id_individual = ma.auto_field(dump_only=True)
+
     class Meta:
         model = Individuals
         include_fk = True
         load_instance = True
         sqla_session = db.session
-        include_relationships = True
+        include_relationships = False
 
     taxref = ma.Nested(TaxrefSchema, many=False)
     additional_data = fields.Dict(required=False, allow_none=True)
