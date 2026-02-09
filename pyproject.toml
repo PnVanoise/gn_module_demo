@@ -40,6 +40,12 @@ where = ["backend"]
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = ["backend"]
+markers = [
+  "unit: tests unitaires rapides",
+  "db: tests avec base de donnees",
+  "integration: tests d'integration (API + DB)",
+  "slow: tests lents",
+]
 
 [tool.coverage.run]
 source = ["gn_module_demo"]

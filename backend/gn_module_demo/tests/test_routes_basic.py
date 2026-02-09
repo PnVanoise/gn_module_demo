@@ -22,7 +22,7 @@ def test_demo_get_not_found(client, users):
 @pytest.mark.usefixtures("client_class")
 class TestIndividuals:
 
-    def test_get_individuals(self, install_module_test_indi, users):
+    def test_get_individuals(self, users):
         with logged_user(self.client, users["admin_user"]):
             response = self.client.get(url_for("demo.list_individuals", id_individuals=1))
         assert response.status_code == 200

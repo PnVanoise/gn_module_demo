@@ -65,3 +65,13 @@ def update_individual():
 def delete_individual(individual):
     db.session.delete(individual)
     db.session.commit()
+
+
+def compute_demo_stats(a, b):
+    return {"sum": a + b, "product": a * b}
+
+
+def repo_raise_for_demo(should_fail=False):
+    if should_fail:
+        raise RuntimeError("Demo repository failure")
+    return {"ok": True}

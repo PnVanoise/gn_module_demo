@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 
 from flask import Blueprint, Response, current_app, jsonify, render_template, request, url_for
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, event, select
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import (
     Session,
     defer,
@@ -30,12 +31,14 @@ from utils_flask_sqla.response import json_resp
 from . import MODULE_CODE
 from .models import Demo, Individuals
 from .repositories import (
+    compute_demo_stats as repo_compute_demo_stats,
     count_individuals_by_taxref as repo_count_individuals_by_taxref,
     create_individual as repo_create_individual,
     delete_individual as repo_delete_individual,
     list_individuals_csv_rows as repo_list_individuals_csv_rows,
     list_individuals_projection as repo_list_individuals_projection,
     list_individuals_with_taxref as repo_list_individuals_with_taxref,
+    repo_raise_for_demo as repo_raise_for_demo,
     search_taxref_autocomplete as repo_search_taxref_autocomplete,
     update_individual as repo_update_individual,
 )
@@ -162,11 +165,16 @@ def _build_inmemory_joinedload_demo():
         session.commit()
 
         query = select(Parent).options(joinedload(Parent.children))
-        parents_raw = session.scalars(query).all()
-        parents_unique = session.scalars(query).unique().all()
+        try:
+            parents_raw = session.scalars(query).all()
+            raw_ids = [p.id_parent for p in parents_raw]
+        except InvalidRequestError:
+            raw_rows = session.execute(select(Parent.id_parent).join(Parent.children)).all()
+            raw_ids = [row[0] for row in raw_rows]
 
-        raw_ids = [p.id_parent for p in parents_raw]
+        parents_unique = session.scalars(query).unique().all()
         unique_ids = [p.id_parent for p in parents_unique]
+
         children_count = len(parents_unique[0].children) if parents_unique else 0
 
     print("inmemory joinedload raw ids:", raw_ids)
@@ -378,6 +386,42 @@ def list_individuals_schema():
     schema = IndividualsSchema(only=["id_individual", "name_individual", "cd_nom", "taxref"])
     result = schema.dump(individuals, many=True)
     print("schema serialization count:", len(result))
+    return result
+
+
+@blueprint.route("/examples/mock/calls", methods=["GET"])
+@login_required
+@json_resp
+def demo_mock_calls():
+    strategies = request.args.getlist("strategy") or ["joined", "selectin"]
+    results = []
+    for strategy in strategies:
+        individuals = repo_list_individuals_with_taxref(load_strategy=strategy)
+        results.append({"strategy": strategy, "count": len(individuals)})
+    return {"strategies": results}
+
+
+@blueprint.route("/examples/mock/args", methods=["GET"])
+@login_required
+@json_resp
+def demo_mock_args():
+    try:
+        a = int(request.args.get("a", 1))
+        b = int(request.args.get("b", 2))
+    except ValueError as exc:
+        raise BadRequest("a and b must be integers") from exc
+    return repo_compute_demo_stats(a, b)
+
+
+@blueprint.route("/examples/mock/error", methods=["GET"])
+@login_required
+@json_resp
+def demo_mock_error():
+    should_fail = request.args.get("fail", "false").lower() in {"1", "true", "yes"}
+    try:
+        result = repo_raise_for_demo(should_fail)
+    except Exception as exc:
+        raise BadRequest(str(exc)) from exc
     return result
 
 

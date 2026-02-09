@@ -1,6 +1,12 @@
+import os
 import pytest
 from sqlalchemy import select
 
+# Ensure RefGeo/Marshmallow use the GeoNature SQLAlchemy instance during test discovery.
+os.environ.setdefault("FLASK_SQLALCHEMY_DB", "geonature.utils.env.db")
+os.environ.setdefault("FLASK_MARSHMALLOW", "geonature.utils.env.ma")
+
+import geonature  # noqa: F401
 from geonature.tests.fixtures import *
 from geonature.tests.fixtures import _session, app, _app, users
 from geonature.tests.test_permissions import g_permissions
@@ -8,9 +14,11 @@ from geonature.utils.config import config as gn_config
 from geonature.utils.env import db
 from geonature.core.gn_commons.models import TModules
 from geonature.core.gn_permissions.models import PermAction, PermObject, Permission
+from pypnusershub.tests.utils import logged_user
 
 from gn_module_demo import MODULE_CODE, MODULE_LABEL, MODULE_PICTO
 from gn_module_demo.blueprint import blueprint as demo_blueprint
+from gn_module_demo.models import Individuals
 
 
 @pytest.fixture
@@ -22,6 +30,72 @@ def client(app):
             url_prefix = f"/{url_prefix}"
         app.register_blueprint(demo_blueprint, url_prefix=url_prefix)
     return app.test_client()
+
+
+@pytest.fixture
+def admin_client(client, users):
+    """Client authentifie en tant qu'admin pour simplifier les tests API."""
+    with logged_user(client, users["admin_user"]):
+        yield client
+
+
+@pytest.fixture
+def taxref_sample(app):
+    """Retourne une entree Taxref existante, sinon skippe les tests dependants."""
+    from apptax.taxonomie.models import Taxref
+
+    taxref = db.session.scalar(select(Taxref).order_by(Taxref.cd_nom))
+    if taxref is None:
+        pytest.skip("Taxref est vide: tests necessitent au moins une entree Taxref.")
+    return taxref
+
+
+@pytest.fixture
+def individual_payload(taxref_sample):
+    return {
+        "name_individual": "Individual Test",
+        "cd_nom": taxref_sample.cd_nom,
+        "additional_data": {"age": 3, "sex": "F"},
+    }
+
+
+@pytest.fixture
+def individual_in_db(taxref_sample):
+    individual = Individuals(
+        name_individual="Individual DB",
+        cd_nom=taxref_sample.cd_nom,
+        additional_data={"age": 5, "sex": "M"},
+    )
+    with db.session.begin_nested():
+        db.session.add(individual)
+        db.session.flush()
+        db.session.refresh(individual)
+    return individual
+
+
+@pytest.fixture
+def individuals_batch(taxref_sample):
+    individuals = [
+        Individuals(
+            name_individual="Batch 1",
+            cd_nom=taxref_sample.cd_nom,
+            additional_data={"age": 2, "sex": "F"},
+        ),
+        Individuals(
+            name_individual="Batch 2",
+            cd_nom=taxref_sample.cd_nom,
+            additional_data={"age": 4, "sex": "M"},
+        ),
+        Individuals(
+            name_individual="Batch 3",
+            cd_nom=taxref_sample.cd_nom,
+            additional_data={"age": 6, "sex": "F"},
+        ),
+    ]
+    with db.session.begin_nested():
+        db.session.add_all(individuals)
+        db.session.flush()
+    return individuals
 
 
 @pytest.fixture(scope="session", autouse=True)
