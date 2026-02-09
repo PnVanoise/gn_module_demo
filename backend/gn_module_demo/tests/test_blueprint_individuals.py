@@ -20,7 +20,15 @@ def test_list_individuals_endpoints_return_list(admin_client, individuals_batch,
 
     assert response.status_code == 200
     payload = response.get_json()
-    assert isinstance(payload, list)
+    if endpoint == "demo.list_individuals":
+        assert isinstance(payload, dict)
+        assert isinstance(payload.get("items"), list)
+        assert payload.get("page") is not None
+        assert payload.get("per_page") is not None
+        assert payload.get("pages") is not None
+        assert payload.get("total") is not None
+    else:
+        assert isinstance(payload, list)
 
 
 @pytest.mark.integration

@@ -7,12 +7,17 @@ from geonature.utils.env import db
 from .models import Individuals
 
 
-def list_individuals_with_taxref(load_strategy="joined"):
+def build_individuals_query(load_strategy="joined"):
     query = db.select(Individuals)
     if load_strategy == "joined":
         query = query.options(joinedload(Individuals.taxref))
     elif load_strategy == "selectin":
         query = query.options(selectinload(Individuals.taxref))
+    return query
+
+
+def list_individuals_with_taxref(load_strategy="joined"):
+    query = build_individuals_query(load_strategy=load_strategy)
     return db.session.scalars(query).unique().all()
 
 

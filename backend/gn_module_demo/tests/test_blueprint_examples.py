@@ -4,6 +4,18 @@ from io import StringIO
 import pytest
 from flask import url_for
 
+from geonature.utils.config import config as gn_config
+
+from gn_module_demo import MODULE_CODE
+
+
+def _demo_prefix():
+    module_config = gn_config.get(MODULE_CODE, {})
+    url_prefix = module_config.get("MODULE_API", "/demo")
+    if not url_prefix.startswith("/"):
+        url_prefix = f"/{url_prefix}"
+    return url_prefix
+
 
 @pytest.mark.integration
 def test_examples_backref(admin_client):
@@ -75,7 +87,7 @@ def test_export_individuals_csv(admin_client):
 
 @pytest.mark.integration
 def test_taxref_autocomplete_empty_query_returns_empty(admin_client):
-    response = admin_client.get(url_for("demo.taxref_autocomplete"))
+    response = admin_client.get(url_for("demo.taxref_autocomplete_legacy"))
 
     assert response.status_code == 200
     assert response.get_json() == []
@@ -88,7 +100,38 @@ def test_taxref_autocomplete_respects_limit(admin_client, taxref_sample):
         pytest.skip("Taxref.nom_complet vide: impossible de tester l'autocomplete.")
     query = query[:3]
 
-    response = admin_client.get(url_for("demo.taxref_autocomplete", q=query, limit=1))
+    response = admin_client.get(
+        url_for("demo.taxref_autocomplete_legacy"),
+        query_string={"q": query, "limit": 1},
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert len(payload) <= 1
+    if payload:
+        assert "cd_nom" in payload[0]
+        assert "nom_complet" in payload[0]
+
+
+@pytest.mark.integration
+def test_taxref_autocomplete_new_route_empty_query_returns_empty(admin_client):
+    response = admin_client.get(url_for("demo.taxref_autocomplete"))
+
+    assert response.status_code == 200
+    assert response.get_json() == []
+
+
+@pytest.mark.integration
+def test_taxref_autocomplete_new_route_respects_limit(admin_client, taxref_sample):
+    query = (taxref_sample.nom_complet or "").strip()
+    if not query:
+        pytest.skip("Taxref.nom_complet vide: impossible de tester l'autocomplete.")
+    query = query[:3]
+
+    response = admin_client.get(
+        url_for("demo.taxref_autocomplete"),
+        query_string={"q": query, "limit": 1},
+    )
 
     assert response.status_code == 200
     payload = response.get_json()

@@ -1,0 +1,13 @@
+.DemoLab {
+  display: grid;
+  gap: 1rem;
+}
+
+.DemoLab__nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.DemoLab__nav a.active {
+  font-weight: 700;
+}

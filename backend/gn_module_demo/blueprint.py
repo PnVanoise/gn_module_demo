@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from io import StringIO
 from urllib.parse import urlparse
 
-from flask import Blueprint, Response, current_app, jsonify, render_template, request, url_for
+from flask import Blueprint, Response, current_app, g, jsonify, render_template, request, url_for
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, event, select
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import (
@@ -35,6 +35,7 @@ from .repositories import (
     count_individuals_by_taxref as repo_count_individuals_by_taxref,
     create_individual as repo_create_individual,
     delete_individual as repo_delete_individual,
+    build_individuals_query as repo_build_individuals_query,
     list_individuals_csv_rows as repo_list_individuals_csv_rows,
     list_individuals_projection as repo_list_individuals_projection,
     list_individuals_with_taxref as repo_list_individuals_with_taxref,
@@ -42,7 +43,7 @@ from .repositories import (
     search_taxref_autocomplete as repo_search_taxref_autocomplete,
     update_individual as repo_update_individual,
 )
-from .schema import demo_list_schema, demo_schema, IndividualsSchema
+from .schema import demo_list_schema, demo_schema, IndividualsSchema, taxref_autocomplete_schema
 
 blueprint = Blueprint("demo", __name__, cli_group="demo")
 blueprint.template_folder = os.path.join(blueprint.root_path, "templates")
@@ -340,9 +341,13 @@ def demo(id_demo):
 @json_resp
 def list_individuals():
     schema = IndividualsSchema()
+    g.pagination_schema = schema
+    limit = request.args.get("limit", type=int, default=50)
+    page = request.args.get("page", type=int, default=1)
+    query = repo_build_individuals_query(load_strategy="joined")
     with _sql_debug("individuals"):
-        individuals = repo_list_individuals_with_taxref(load_strategy="joined")
-    return schema.dump(individuals, many=True)
+        pagination = db.paginate(query, page=page, per_page=limit, error_out=False)
+    return pagination
 
 
 @blueprint.route("/individuals", methods=["POST"])
@@ -692,17 +697,29 @@ def count_individuals_by_taxref():
     return [{"cd_nom": cd_nom, "count": count} for cd_nom, count in rows]
 
 
-@blueprint.route("/examples/taxref/autocomplete", methods=["GET"])
-@login_required
-@json_resp
-def taxref_autocomplete():
+def _taxref_autocomplete_payload():
     q = request.args.get("q", "").strip()
     if not q:
         return []
     limit = request.args.get("limit", type=int) or 10
     with _sql_debug("autocomplete"):
         rows = repo_search_taxref_autocomplete(q, limit=limit)
-    return [{"cd_nom": cd_nom, "nom_complet": nom_complet} for cd_nom, nom_complet in rows]
+    payload = [{"cd_nom": cd_nom, "nom_complet": nom_complet} for cd_nom, nom_complet in rows]
+    return taxref_autocomplete_schema.dump(payload)
+
+
+@blueprint.route("/taxref/autocomplete", methods=["GET"])
+@login_required
+@json_resp
+def taxref_autocomplete():
+    return _taxref_autocomplete_payload()
+
+
+@blueprint.route("/examples/taxref/autocomplete", methods=["GET"])
+@login_required
+@json_resp
+def taxref_autocomplete_legacy():
+    return _taxref_autocomplete_payload()
 
 
 @blueprint.route("/examples/relationships/backref", methods=["GET"])

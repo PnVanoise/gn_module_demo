@@ -17,6 +17,14 @@ class DemoSchema(Schema):
 
 demo_schema = DemoSchema()
 demo_list_schema = DemoSchema(many=True)
+
+
+class TaxrefAutocompleteSchema(Schema):
+    cd_nom = fields.Integer(required=True)
+    nom_complet = fields.String(required=True)
+
+
+taxref_autocomplete_schema = TaxrefAutocompleteSchema(many=True)
 ADDITIONAL_DATA_MANDATORY = ["age", "sex"]
 
 

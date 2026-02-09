@@ -1,0 +1,42 @@
+<section class="DemoForm">
+  <h3>Creation d'un individu (Reactive Forms)</h3>
+  <form [formGroup]="form" (ngSubmit)="submit()" data-qa="demo-form">
+    <label>
+      Nom
+      <input type="text" formControlName="name_individual" />
+    </label>
+    <div class="error" *ngIf="form.get('name_individual')?.touched && form.get('name_individual')?.invalid">
+      Le nom est requis (max 80 caracteres).
+    </div>
+
+    <label>
+      Espece (Taxref)
+      <ng-select
+        [items]="taxrefResults"
+        bindLabel="nom_complet"
+        bindValue="cd_nom"
+        [loading]="taxrefLoading"
+        [searchable]="true"
+        [clearable]="true"
+        formControlName="cd_nom"
+        (search)="searchTaxref($event.term)"
+        placeholder="Rechercher une espece"
+      ></ng-select>
+    </label>
+    <div class="error" *ngIf="form.get('cd_nom')?.touched && form.get('cd_nom')?.invalid">
+      Selectionnez une espece (cd_nom requis).
+    </div>
+
+    <label>
+      Notes
+      <textarea formControlName="notes"></textarea>
+    </label>
+
+    <button type="submit" [disabled]="saving">Enregistrer</button>
+  </form>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <div class="success" *ngIf="created">
+    Individu cree: {{ created.id_individual }} - {{ created.name_individual }}
+  </div>
+</section>

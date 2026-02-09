@@ -1,0 +1,27 @@
+<section class="DemoState">
+  <h3>Etat partage (BehaviorSubject)</h3>
+  <div class="DemoState__grid">
+    <div>
+      <h4>Demos</h4>
+      <ul>
+        <li *ngFor="let demo of demos$ | async">
+          <button type="button" (click)="selectDemo(demo)">
+            Selectionner {{ demo.id_demo }}
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div>
+      <h4>Selection actuelle</h4>
+      <ng-container *ngIf="selectedDemo$ | async as selected; else empty">
+        Demo selectionne : {{ selected.id_demo }}
+      </ng-container>
+      <ng-template #empty>
+        Aucun demo selectionne.
+      </ng-template>
+      <div>
+        <button type="button" (click)="clearSelection()">Reinitialiser</button>
+      </div>
+    </div>
+  </div>
+</section>

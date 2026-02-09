@@ -1,0 +1,28 @@
+.DemoIndividuals {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.DemoIndividuals__meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #4a4a4a;
+}
+
+.DemoIndividuals__pager {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.DemoIndividuals table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.DemoIndividuals th,
+.DemoIndividuals td {
+  border-bottom: 1px solid #ddd;
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}

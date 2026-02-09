@@ -1,0 +1,34 @@
+<section class="DemoIndividuals" *ngIf="individuals$ | async as individuals">
+  <h3>Liste des individus</h3>
+  <div class="DemoIndividuals__meta">
+    <span>Page {{ individuals.page }} / {{ individuals.pages }}</span>
+    <span>Total {{ individuals.total }}</span>
+  </div>
+  <div *ngIf="individuals.items.length === 0">Aucun individu disponible.</div>
+  <table *ngIf="individuals.items.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>cd_nom</th>
+        <th>Taxref</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of individuals.items; trackBy: trackByIndividualId">
+        <td>{{ item.id_individual }}</td>
+        <td>{{ item.name_individual }}</td>
+        <td>{{ item.cd_nom }}</td>
+        <td>{{ item.taxref?.nom_complet || '-' }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="DemoIndividuals__pager">
+    <button type="button" (click)="prevPage(individuals)" [disabled]="!individuals.prev_num">
+      Page précédente
+    </button>
+    <button type="button" (click)="nextPage(individuals)" [disabled]="!individuals.next_num">
+      Page suivante
+    </button>
+  </div>
+</section>

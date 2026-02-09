@@ -1,0 +1,13 @@
+<section class="DemoRxjs">
+  <h3>Recherche Taxref (RxJS)</h3>
+  <label>
+    Recherche
+    <input type="text" [formControl]="searchControl" placeholder="Ex: Lynx" />
+  </label>
+
+  <ul>
+    <li *ngFor="let item of results$ | async">
+      {{ item.cd_nom }} - {{ item.nom_complet }}
+    </li>
+  </ul>
+</section>

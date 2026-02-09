@@ -1,0 +1,9 @@
+<section class="DemoResolved">
+  <h3>Route resolue</h3>
+  <ng-container *ngIf="demo$ | async as demo; else empty">
+    Demo resolu : {{ demo.id_demo }}
+  </ng-container>
+  <ng-template #empty>
+    Aucun demo resolu.
+  </ng-template>
+</section>
