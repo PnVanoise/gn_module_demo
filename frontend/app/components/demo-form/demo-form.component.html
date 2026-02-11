@@ -27,10 +27,38 @@
       Selectionnez une espece (cd_nom requis).
     </div>
 
-    <label>
-      Notes
-      <textarea formControlName="notes"></textarea>
-    </label>
+    <fieldset formGroupName="additional_data">
+      <legend>Donnees additionnelles (async validator)</legend>
+      <p class="hint">
+        Ces champs sont valides si age et sex sont tous les deux renseignes. Age doit etre un entier,
+        sex doit etre parmi M, F, U. La validation asynchrone appelle la route backend.
+      </p>
+      <label>
+        Age
+        <input type="number" formControlName="age" placeholder="Ex: 3" />
+      </label>
+      <label>
+        Sex
+        <input type="text" formControlName="sex" placeholder="Ex: F" />
+      </label>
+      <label>
+        Notes
+        <textarea formControlName="notes"></textarea>
+      </label>
+      <div class="error" *ngIf="form.get('additional_data')?.errors?.additionalData">
+        <ng-container *ngIf="form.get('additional_data')?.errors?.additionalData as errors">
+          <ng-container *ngIf="errors.length; else genericAdditionalError">
+            <div *ngFor="let message of errors">{{ message }}</div>
+          </ng-container>
+        </ng-container>
+        <ng-template #genericAdditionalError>
+          Les donnees additionnelles sont invalides.
+        </ng-template>
+      </div>
+      <div class="pending" *ngIf="form.get('additional_data')?.pending">
+        Validation asynchrone en cours...
+      </div>
+    </fieldset>
 
     <button type="submit" [disabled]="saving">Enregistrer</button>
   </form>

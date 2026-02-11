@@ -2,12 +2,15 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   AbstractControl,
+  AsyncValidatorFn,
   FormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { of, timer } from 'rxjs';
 import { GN2CommonModule } from '@geonature_common/GN2Common.module';
 
 import { DemoService } from '../../services/demo.service';
@@ -22,6 +25,88 @@ function positiveIntegerValidator(): ValidatorFn {
       return { positiveInteger: true };
     }
     return null;
+  };
+}
+
+const ADDITIONAL_DATA_ALLOWED_SEX = ['M', 'F', 'U'];
+
+function additionalDataSyncValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = (control.value ?? {}) as {
+      age?: unknown;
+      sex?: unknown;
+      notes?: unknown;
+    };
+    const age = value.age;
+    const sexRaw = value.sex;
+    const sex = typeof sexRaw === 'string' ? sexRaw.trim() : sexRaw;
+    const notes = typeof value.notes === 'string' ? value.notes.trim() : value.notes;
+    const hasAge = age !== null && age !== undefined && age !== '';
+    const hasSex = sex !== null && sex !== undefined && sex !== '';
+    const hasNotes = notes !== null && notes !== undefined && notes !== '';
+
+    if (!hasAge && !hasSex && !hasNotes) {
+      return null;
+    }
+    const errors: string[] = [];
+    if (!hasAge || !hasSex) {
+      errors.push('Les champs age et sex sont obligatoires ensemble.');
+    }
+    if (hasAge) {
+      const parsedAge = Number(age);
+      if (!Number.isInteger(parsedAge)) {
+        errors.push("L'age doit etre un entier.");
+      } else if (parsedAge < 0) {
+        errors.push("L'age doit etre superieur ou egal a 0.");
+      }
+    }
+    if (hasSex) {
+      if (typeof sex !== 'string') {
+        errors.push('Le champ sex doit etre une chaine.');
+      } else if (!ADDITIONAL_DATA_ALLOWED_SEX.includes(sex)) {
+        errors.push(`Sex doit etre parmi: ${ADDITIONAL_DATA_ALLOWED_SEX.join(', ')}.`);
+      }
+    }
+
+    return errors.length ? { additionalData: errors } : null;
+  };
+}
+
+function additionalDataAsyncValidator(demoService: DemoService): AsyncValidatorFn {
+  return (control: AbstractControl) => {
+    const value = (control.value ?? {}) as {
+      age?: unknown;
+      sex?: unknown;
+      notes?: unknown;
+    };
+    const age = value.age;
+    const sex = typeof value.sex === 'string' ? value.sex.trim() : value.sex;
+    const notes = typeof value.notes === 'string' ? value.notes.trim() : value.notes;
+    const hasAge = age !== null && age !== undefined && age !== '';
+    const hasSex = sex !== null && sex !== undefined && sex !== '';
+    const hasNotes = notes !== null && notes !== undefined && notes !== '';
+
+    if (!hasAge && !hasSex && !hasNotes) {
+      return of(null);
+    }
+    return timer(300).pipe(
+      switchMap(() =>
+        demoService.validateIndividual({
+          additional_data: value,
+        })
+      ),
+      map(() => null),
+      catchError((err) => {
+        const messages = err?.error?.errors?.additional_data;
+        if (Array.isArray(messages) && messages.length) {
+          return of({ additionalData: messages });
+        }
+        if (typeof messages === 'string') {
+          return of({ additionalData: [messages] });
+        }
+        return of({ additionalData: ['Validation serveur: donnees additionnelles invalides.'] });
+      })
+    );
   };
 }
 
@@ -41,7 +126,17 @@ export class DemoFormComponent implements CanLeaveForm {
   form = this._fb.group({
     name_individual: ['', [Validators.required, Validators.maxLength(80)]],
     cd_nom: [null, [Validators.required, positiveIntegerValidator()]],
-    notes: [''],
+    additional_data: this._fb.group(
+      {
+        age: [null],
+        sex: [''],
+        notes: [''],
+      },
+      {
+        validators: [additionalDataSyncValidator()],
+        asyncValidators: [additionalDataAsyncValidator(this._demoService)],
+      }
+    ),
   });
 
   constructor(
@@ -65,22 +160,39 @@ export class DemoFormComponent implements CanLeaveForm {
         this.taxrefResults = [];
         this.taxrefLoading = false;
       },
+      complete: () => {
+        this.taxrefLoading = false;
+      },
     });
   }
 
   submit() {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.form.pending) {
       this.form.markAllAsTouched();
       return;
     }
     this.saving = true;
     this.errorMessage = null;
+    const additionalData = this.form.value.additional_data ?? {};
+    const age = additionalData.age;
+    const sex = typeof additionalData.sex === 'string' ? additionalData.sex.trim() : additionalData.sex;
+    const notes =
+      typeof additionalData.notes === 'string' ? additionalData.notes.trim() : additionalData.notes;
+    const hasAge = age !== null && age !== undefined && age !== '';
+    const hasSex = sex !== null && sex !== undefined && sex !== '';
+    const hasNotes = notes !== null && notes !== undefined && notes !== '';
+    const payloadAdditionalData =
+      hasAge && hasSex
+        ? {
+            age: Number(age),
+            sex,
+            ...(hasNotes ? { notes } : {}),
+          }
+        : undefined;
     const payload = {
       name_individual: this.form.value.name_individual ?? '',
       cd_nom: this.form.value.cd_nom ? Number(this.form.value.cd_nom) : null,
-      additional_data: {
-        notes: this.form.value.notes ?? '',
-      },
+      additional_data: payloadAdditionalData,
     };
     this._demoService.createIndividual(payload).subscribe({
       next: (created) => {

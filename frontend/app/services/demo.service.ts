@@ -49,6 +49,26 @@ export class DemoService {
     return this._http.post<Individual>(this.buildUrl(DEMO_ENDPOINTS.individuals), payload);
   }
 
+  validateIndividual(payload: Partial<IndividualPayload>): Observable<{ valid: boolean; errors?: unknown }> {
+    return this._http.post<{ valid: boolean; errors?: unknown }>(
+      this.buildUrl(DEMO_ENDPOINTS.individualsValidate),
+      payload
+    );
+  }
+
+  updateIndividual(id_individual: number, payload: Partial<IndividualPayload>): Observable<Individual> {
+    return this._http.put<Individual>(
+      this.buildUrl(`${DEMO_ENDPOINTS.individuals}/${id_individual}`),
+      payload
+    );
+  }
+
+  deleteIndividual(id_individual: number): Observable<{ status: string; id_individual: number }> {
+    return this._http.delete<{ status: string; id_individual: number }>(
+      this.buildUrl(`${DEMO_ENDPOINTS.individuals}/${id_individual}`)
+    );
+  }
+
   getDemoStats(a: number, b: number): Observable<DemoStats> {
     const params = new HttpParams().set('a', a).set('b', b);
     return this._http.get<DemoStats>(this.buildUrl(DEMO_ENDPOINTS.demoStats), { params });

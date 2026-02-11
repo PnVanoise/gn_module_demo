@@ -5,6 +5,11 @@ export interface Individual {
   name_individual: string;
   cd_nom: number | null;
   taxref?: TaxrefLite | null;
+  additional_data?: {
+    age?: number | null;
+    sex?: string | null;
+    notes?: string | null;
+  } | null;
 }
 
 export interface IndividualPayload {

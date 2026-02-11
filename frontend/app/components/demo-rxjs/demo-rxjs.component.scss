@@ -1,11 +1,378 @@
 .DemoRxjs {
   display: grid;
+  gap: 1.25rem;
+  max-width: 960px;
+}
+
+.DemoRxjs__section {
+  display: grid;
   gap: 0.75rem;
-  max-width: 480px;
+  padding: 0.75rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.DemoRxjs__simulators {
+  display: grid;
+  gap: 1rem;
+}
+
+.DemoRxjs__simulatorBlock {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ededed;
+  background: #fcfcfc;
+}
+
+.DemoRxjs__simMeta {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.DemoRxjs__simMetaBlock {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  border: 1px dashed #e0e0e0;
+  background: #fff;
+}
+
+.DemoRxjs__simMetaBlock--full {
+  padding: 0.75rem;
+}
+
+.DemoRxjs__simMetaBlock h6 {
+  margin: 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #4a4a4a;
+}
+
+.DemoRxjs__inlineList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.DemoRxjs__inlineList li {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: #eef2f5;
+  border: 1px solid #d2d9df;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #284057;
+}
+
+.DemoRxjs__metaList {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+  color: #4a4a4a;
+  font-size: 0.9rem;
+}
+
+.DemoRxjs__metaList li {
+  line-height: 1.4;
+}
+
+.DemoRxjs__simBody {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.DemoRxjs__simHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.DemoRxjs__simHeaderText {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.DemoRxjs__simHeaderText h5 {
+  margin: 0;
+}
+
+.DemoRxjs__operatorTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid #d2d9df;
+  background: #eef2f5;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #284057;
+}
+
+.DemoRxjs__simulator {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.DemoRxjs__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.DemoRxjs__controls select {
+  padding: 0.35rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid #cfcfcf;
+  min-width: 160px;
+}
+
+.DemoRxjs__controls input {
+  padding: 0.35rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid #cfcfcf;
+}
+
+.DemoRxjs__controlButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.DemoRxjs__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.DemoRxjs__ghostButton {
+  border: 1px solid #d5d5d5;
+  background: transparent;
+  color: #333;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.DemoRxjs__ghostButton:hover {
+  background: #f3f3f3;
+}
+
+.DemoRxjs__params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px dashed #d9d9d9;
+  background: #fcfcfc;
+}
+
+.DemoRxjs__params label {
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.DemoRxjs__params input,
+.DemoRxjs__params select {
+  min-width: 160px;
+}
+
+.DemoRxjs__timings {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px dashed #d9d9d9;
+  background: #fcfcfc;
+}
+
+.DemoRxjs__timingGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.DemoRxjs__timingTitle {
+  font-weight: 600;
+  color: #3a3a3a;
+  min-width: 140px;
+}
+
+.DemoRxjs__timingGroup label {
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.DemoRxjs__timingGroup input {
+  width: 90px;
+  padding: 0.35rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid #cfcfcf;
+}
+
+.DemoRxjs__simPreview {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.DemoRxjs__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.DemoRxjs__chip {
+  border: 1px solid #d2d9df;
+  background: #eef2f5;
+  color: #284057;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.DemoRxjs__chip--muted {
+  background: #f6f6f6;
+  border-color: #e0e0e0;
+  color: #555;
+}
+
+.DemoRxjs__simLegend {
+  margin: 0;
+  color: #6a6a6a;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.DemoRxjs__simLegend--timeline {
+  display: grid;
+  gap: 0.2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.DemoRxjs__simDesc {
+  margin: 0;
+  color: #5b5b5b;
+  font-size: 0.9rem;
+}
+
+.DemoRxjs__timeline {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+  background: #f9fafb;
+}
+
+.DemoRxjs__timelineRow {
+  display: grid;
+  grid-template-columns: 70px 90px 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.DemoRxjs__time {
+  font-variant-numeric: tabular-nums;
+  color: #666;
+}
+
+.DemoRxjs__lane {
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+  border-radius: 999px;
+  padding: 0.1rem 0.4rem;
+}
+
+.DemoRxjs__lane--source {
+  background: #e1f0fa;
+  border: 1px solid #c0dff2;
+  color: #1c6ca1;
+}
+
+.DemoRxjs__lane--output {
+  background: #e9f6ee;
+  border: 1px solid #cfe8d6;
+  color: #0b7d2a;
+}
+
+.DemoRxjs__lane--info {
+  background: #fff4dc;
+  border: 1px solid #f3dfb5;
+  color: #8a5200;
+}
+
+.DemoRxjs__lane--subA {
+  background: #e9f6ee;
+  border: 1px solid #cfe8d6;
+  color: #0b7d2a;
+}
+
+.DemoRxjs__lane--subB {
+  background: #f0ecfb;
+  border: 1px solid #d7ccf4;
+  color: #5b3ba6;
+}
+
+.DemoRxjs__empty {
+  margin: 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.DemoRxjs__grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.DemoRxjs__card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background: #fafafa;
 }
 
 .DemoRxjs label {
   display: grid;
   gap: 0.25rem;
   font-weight: 600;
+}
+
+.DemoRxjs pre {
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: #f2f2f2;
+  font-size: 0.85rem;
+  overflow-x: auto;
+}
+
+.DemoRxjs button {
+  align-self: start;
 }

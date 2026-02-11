@@ -1,13 +1,856 @@
 <section class="DemoRxjs">
-  <h3>Recherche Taxref (RxJS)</h3>
-  <label>
-    Recherche
-    <input type="text" [formControl]="searchControl" placeholder="Ex: Lynx" />
-  </label>
+  <h3>RxJS et programmation réactive</h3>
 
-  <ul>
-    <li *ngFor="let item of results$ | async">
-      {{ item.cd_nom }} - {{ item.nom_complet }}
-    </li>
-  </ul>
+  <section class="DemoRxjs__section">
+    <h4>2.3.1 Introduction à RxJS</h4>
+    <ul>
+      <li *ngFor="let point of introPoints">{{ point }}</li>
+    </ul>
+    <p>
+      Exemple de pipeline d'opérateurs :
+    </p>
+    <pre>{{ operatorPipeline$ | async | json }}</pre>
+  </section>
+
+  <section class="DemoRxjs__section">
+    <h4>Simulateur d'opérateurs</h4>
+    <div class="DemoRxjs__simulators">
+      <div class="DemoRxjs__simulatorBlock">
+        <div class="DemoRxjs__simHeader">
+          <div class="DemoRxjs__simHeaderText">
+            <h5>Filtrage</h5>
+            <span class="DemoRxjs__operatorTag">filter</span>
+          </div>
+          <div class="DemoRxjs__controlButtons">
+            <button type="button" (click)="simulateOperatorFor('filter')" [disabled]="simulationStates.filter.running">
+              Simuler
+            </button>
+            <button type="button" class="DemoRxjs__ghostButton" (click)="clearSimulationFor('filter')">
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+
+        <div class="DemoRxjs__simMeta">
+          <div class="DemoRxjs__simMetaBlock">
+            <h6>Types d'opérateurs simulés</h6>
+            <ul class="DemoRxjs__inlineList">
+              <li>filter</li>
+            </ul>
+          </div>
+          <div class="DemoRxjs__simMetaBlock">
+            <h6>Présentation du type d'opérateurs RxJS</h6>
+            <p>
+              Les opérateurs de filtrage laissent passer uniquement les valeurs qui respectent un
+              critère (pairs/impairs, seuil, etc.).
+            </p>
+          </div>
+        </div>
+
+        <div class="DemoRxjs__simMetaBlock DemoRxjs__simMetaBlock--full">
+          <h6>Simulateurs</h6>
+          <div class="DemoRxjs__simBody">
+            <div class="DemoRxjs__params">
+              <label>
+                Valeurs source (csv)
+                <input type="text" [formControl]="filterValues" placeholder="1,2,3,4" />
+              </label>
+              <label>
+                Intervalle entre emissions (ms)
+                <input type="number" min="0" step="10" [formControl]="filterInterval" />
+              </label>
+              <label>
+                Mode filtre
+                <select [formControl]="filterMode">
+                  <option value="even">Pairs</option>
+                  <option value="odd">Impairs</option>
+                  <option value="gte">Superieurs ou egaux au seuil</option>
+                </select>
+              </label>
+              <label *ngIf="filterMode.value === 'gte'">
+                Seuil
+                <input type="number" step="1" [formControl]="filterThreshold" />
+              </label>
+            </div>
+
+            <div class="DemoRxjs__simPreview">
+              <div class="DemoRxjs__chips">
+                <span class="DemoRxjs__chip" *ngFor="let item of simulationStates.filter.preview.source">
+                  {{ item.value }} · +{{ item.delay }}ms
+                </span>
+              </div>
+              <p class="DemoRxjs__simLegend">
+                La source emet les valeurs indiquees, seules celles qui passent le filtre apparaissent en sortie.
+              </p>
+              <div class="DemoRxjs__simLegend DemoRxjs__simLegend--timeline" *ngIf="simulationStates.filter.timeline.length">
+                <div *ngFor="let entry of simulationStates.filter.timeline">
+                  {{ entry.value }} emet a +{{ entry.emittedAt }}ms
+                </div>
+              </div>
+              <p class="DemoRxjs__simDesc">
+                {{ simulationStates.filter.preview.description }}
+              </p>
+            </div>
+
+            <div class="DemoRxjs__timeline" *ngIf="simulationStates.filter.logs.length > 0">
+              <div class="DemoRxjs__timelineRow" *ngFor="let log of simulationStates.filter.logs">
+                <span class="DemoRxjs__time">{{ log.t }}ms</span>
+                <span class="DemoRxjs__lane DemoRxjs__lane--{{ log.lane }}">{{ log.lane }}</span>
+                <span class="DemoRxjs__value">{{ log.value }}</span>
+              </div>
+            </div>
+            <p class="DemoRxjs__empty" *ngIf="simulationStates.filter.logs.length === 0">
+              Lancez une simulation pour voir le filtrage dans le temps.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="DemoRxjs__simulatorBlock">
+        <div class="DemoRxjs__simHeader">
+          <div class="DemoRxjs__simHeaderText">
+            <h5>Conditionnels</h5>
+            <span class="DemoRxjs__operatorTag">{{ conditionalOperatorControl.value || 'iif' }}</span>
+          </div>
+          <div class="DemoRxjs__controlButtons">
+            <button type="button" (click)="simulateOperatorFor('conditional')" [disabled]="simulationStates.conditional.running">
+              Simuler
+            </button>
+            <button type="button" class="DemoRxjs__ghostButton" (click)="clearSimulationFor('conditional')">
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+
+        <div class="DemoRxjs__simMeta">
+          <div class="DemoRxjs__simMetaBlock">
+            <h6>Types d'opérateurs simulés</h6>
+            <ul class="DemoRxjs__inlineList">
+              <li>iif</li>
+              <li>takeWhile</li>
+              <li>defaultIfEmpty</li>
+            </ul>
+          </div>
+          <div class="DemoRxjs__simMetaBlock">
+            <h6>Présentation du type d'opérateurs RxJS</h6>
+            <p>
+              Les conditionnels choisissent une branche, fournissent un resultat de secours ou
+              terminent le flux selon une regle metier.
+            </p>
+          </div>
+        </div>
+
+        <div class="DemoRxjs__simMetaBlock DemoRxjs__simMetaBlock--full">
+          <h6>Simulateurs</h6>
+          <div class="DemoRxjs__simBody">
+            <div class="DemoRxjs__controls">
+              <label>
+                Opérateur
+                <select [formControl]="conditionalOperatorControl">
+                  <option *ngFor="let op of conditionalOperatorOptions" [value]="op.key">
+                    {{ op.label }}
+                  </option>
+                </select>
+              </label>
+            </div>
+
+            <div class="DemoRxjs__params" *ngIf="conditionalOperatorControl.value === 'iif'">
+              <label class="DemoRxjs__toggle">
+                <span>Condition vraie</span>
+                <input type="checkbox" [formControl]="conditionControl" />
+              </label>
+              <label>
+                Valeur cache
+                <input type="text" [formControl]="iifCacheValue" />
+              </label>
+              <label>
+                Valeur api
+                <input type="text" [formControl]="iifApiValue" />
+              </label>
+              <label>
+                Delai api (ms)
+                <input type="number" min="0" step="50" [formControl]="iifDelay" />
+              </label>
+            </div>
+
+            <div class="DemoRxjs__params" *ngIf="conditionalOperatorControl.value === 'takeWhile'">
+              <label>
+                Valeurs source (csv)
+                <input type="text" [formControl]="takeWhileValues" placeholder="1,2,3,4" />
+              </label>
+              <label>
+                Intervalle entre emissions (ms)
+                <input type="number" min="0" step="10" [formControl]="takeWhileInterval" />
+              </label>
+              <label>
+                Seuil takeWhile
+                <input type="number" step="1" [formControl]="takeWhileThreshold" />
+              </label>
+            </div>
+
+            <div class="DemoRxjs__params" *ngIf="conditionalOperatorControl.value === 'defaultIfEmpty'">
+              <label class="DemoRxjs__toggle">
+                <span>Source vide</span>
+                <input type="checkbox" [formControl]="defaultIfEmptyEmpty" />
+              </label>
+              <label *ngIf="!defaultIfEmptyEmpty.value">
+                Valeurs source (csv)
+                <input type="text" [formControl]="defaultIfEmptyValues" placeholder="1,2,3" />
+              </label>
+              <label *ngIf="!defaultIfEmptyEmpty.value">
+                Intervalle entre emissions (ms)
+                <input type="number" min="0" step="10" [formControl]="defaultIfEmptyInterval" />
+              </label>
+            </div>
+
+            <div class="DemoRxjs__simPreview">
+              <div class="DemoRxjs__chips">
+                <span class="DemoRxjs__chip" *ngFor="let item of simulationStates.conditional.preview.source">
+                  {{ item.value }} · +{{ item.delay }}ms
+                </span>
+              </div>
+              <p class="DemoRxjs__simLegend" *ngIf="conditionalOperatorControl.value === 'iif'">
+                La condition decide si la branche cache (immediate) ou api (avec delai) est utilisee.
+              </p>
+              <p class="DemoRxjs__simLegend" *ngIf="conditionalOperatorControl.value === 'takeWhile'">
+                Le flux emet tant que la condition est vraie. Au premier faux, il complete.
+              </p>
+              <p class="DemoRxjs__simLegend" *ngIf="conditionalOperatorControl.value === 'defaultIfEmpty'">
+                Si aucune valeur ne sort de la source, la valeur par defaut est emise.
+              </p>
+              <div class="DemoRxjs__simLegend DemoRxjs__simLegend--timeline" *ngIf="simulationStates.conditional.timeline.length">
+                <div *ngFor="let entry of simulationStates.conditional.timeline">
+                  {{ entry.value }} emet a +{{ entry.emittedAt }}ms
+                </div>
+              </div>
+              <p class="DemoRxjs__simDesc">
+                {{ simulationStates.conditional.preview.description }}
+              </p>
+            </div>
+
+            <div class="DemoRxjs__timeline" *ngIf="simulationStates.conditional.logs.length > 0">
+              <div class="DemoRxjs__timelineRow" *ngFor="let log of simulationStates.conditional.logs">
+                <span class="DemoRxjs__time">{{ log.t }}ms</span>
+                <span class="DemoRxjs__lane DemoRxjs__lane--{{ log.lane }}">{{ log.lane }}</span>
+                <span class="DemoRxjs__value">{{ log.value }}</span>
+              </div>
+            </div>
+            <p class="DemoRxjs__empty" *ngIf="simulationStates.conditional.logs.length === 0">
+              Lancez une simulation pour voir la selection conditionnelle dans le temps.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="DemoRxjs__simulatorBlock">
+        <div class="DemoRxjs__simHeader">
+          <div class="DemoRxjs__simHeaderText">
+            <h5>Agrégation</h5>
+          </div>
+          <div class="DemoRxjs__controlButtons">
+            <button type="button" (click)="simulateOperatorFor('aggregation')" [disabled]="simulationStates.aggregation.running">
+              Simuler
+            </button>
+            <button type="button" class="DemoRxjs__ghostButton" (click)="clearSimulationFor('aggregation')">
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+
+        <div class="DemoRxjs__simMeta">
+          <div class="DemoRxjs__simMetaBlock">
+            <h6>Types d'opérateurs simulés</h6>
+            <ul class="DemoRxjs__inlineList">
+              <li>scan</li>
+              <li>reduce</li>
+            </ul>
+          </div>
+          <div class="DemoRxjs__simMetaBlock">
+            <h6>Présentation du type d'opérateurs RxJS</h6>
+            <p>
+              Les aggregations construisent un cumul ou un bilan final a partir d'un flux de valeurs.
+            </p>
+          </div>
+        </div>
+
+        <div class="DemoRxjs__simMetaBlock DemoRxjs__simMetaBlock--full">
+          <h6>Simulateurs</h6>
+          <div class="DemoRxjs__simBody">
+            <div class="DemoRxjs__controls">
+              <label>
+                Opérateur
+                <select [formControl]="aggregationOperatorControl">
+                  <option *ngFor="let op of aggregationOperatorOptions" [value]="op.key">
+                    {{ op.label }}
+                  </option>
+                </select>
+              </label>
+            </div>
+
+            <div class="DemoRxjs__params">
+              <label>
+                Valeurs source (csv)
+                <input type="text" [formControl]="aggregationValues" placeholder="1,2,3,4" />
+              </label>
+              <label>
+                Intervalle entre emissions (ms)
+                <input type="number" min="0" step="10" [formControl]="aggregationInterval" />
+              </label>
+            </div>
+
+            <div class="DemoRxjs__simPreview">
+              <div class="DemoRxjs__chips">
+                <span class="DemoRxjs__chip" *ngFor="let item of simulationStates.aggregation.preview.source">
+                  {{ item.value }} · +{{ item.delay }}ms
+                </span>
+              </div>
+              <p class="DemoRxjs__simLegend">
+                scan emet un cumul a chaque emission, reduce emet un total final en fin de flux.
+              </p>
+              <div class="DemoRxjs__simLegend DemoRxjs__simLegend--timeline" *ngIf="simulationStates.aggregation.timeline.length">
+                <div *ngFor="let entry of simulationStates.aggregation.timeline">
+                  {{ entry.value }} emet a +{{ entry.emittedAt }}ms
+                </div>
+              </div>
+              <p class="DemoRxjs__simDesc">
+                {{ simulationStates.aggregation.preview.description }}
+              </p>
+            </div>
+
+            <div class="DemoRxjs__timeline" *ngIf="simulationStates.aggregation.logs.length > 0">
+              <div class="DemoRxjs__timelineRow" *ngFor="let log of simulationStates.aggregation.logs">
+                <span class="DemoRxjs__time">{{ log.t }}ms</span>
+                <span class="DemoRxjs__lane DemoRxjs__lane--{{ log.lane }}">{{ log.lane }}</span>
+                <span class="DemoRxjs__value">{{ log.value }}</span>
+              </div>
+            </div>
+            <p class="DemoRxjs__empty" *ngIf="simulationStates.aggregation.logs.length === 0">
+              Lancez une simulation pour visualiser l aggregation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="DemoRxjs__section">
+    <h4>2.3.2 Les fondamentaux de RxJS</h4>
+    <div class="DemoRxjs__grid">
+      <div class="DemoRxjs__card">
+        <h5>Design Pattern Observer</h5>
+        <pre>{{ observerPatternLogs$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Contrat Observable (next/error/complete)</h5>
+        <pre>{{ observableContractLogs$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Création manuelle</h5>
+        <pre>{{ manualObservable$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Depuis des données</h5>
+        <pre>{{ fromData$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Depuis une promesse</h5>
+        <pre>{{ fromPromise$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Lazy evaluation (defer)</h5>
+        <pre>{{ lazyEvaluation$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Encapsulation async native</h5>
+        <pre>{{ wrapTimeout$ | async | json }}</pre>
+      </div>
+    </div>
+
+    <div class="DemoRxjs__grid">
+      <div class="DemoRxjs__card">
+        <h5>Observer un observable (fromEvent)</h5>
+        <button #clickButton type="button">Cliquer</button>
+        <p>Clicks : {{ clickCount }}</p>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Gestion des souscriptions</h5>
+        <pre>{{ manualSubscriptionLog | json }}</pre>
+      </div>
+    </div>
+
+    <div class="DemoRxjs__card">
+      <h5>Exemple réel (autocomplete Taxref)</h5>
+      <label>
+        Recherche
+        <input type="text" [formControl]="searchControl" placeholder="Ex: Lynx" />
+      </label>
+      <ul>
+        <li *ngFor="let item of results$ | async">
+          {{ item.cd_nom }} - {{ item.nom_complet }}
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="DemoRxjs__section">
+    <h4>2.3.3 Les opérateurs, manipulation des flux de données</h4>
+    <div class="DemoRxjs__grid">
+      <div class="DemoRxjs__card">
+        <h5>Filtrage</h5>
+        <pre>{{ filterOperators$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Conditionnels</h5>
+        <pre>{{ conditionalOperators$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Transformation</h5>
+        <pre>{{ transformOperators$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Agrégation</h5>
+        <pre>{{ aggregationOperators$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Utilitaires</h5>
+        <pre>{{ utilityOperators$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Opérateur custom</h5>
+        <pre>{{ customOperator$ | async | json }}</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="DemoRxjs__section">
+    <h4>2.3.4 Observables chauds / froids</h4>
+    <div class="DemoRxjs__simMeta">
+      <div class="DemoRxjs__simMetaBlock">
+        <h6>Présentation</h6>
+        <p>
+          Un flux froid relance sa production pour chaque abonné. Un flux chaud partage une
+          même source, ce qui mutualise le travail mais fait manquer les émissions passées aux abonnés tardifs.
+        </p>
+      </div>
+      <div class="DemoRxjs__simMetaBlock">
+        <h6>Contextes d'utilisation</h6>
+        <ul class="DemoRxjs__metaList">
+          <li>Flux froids : requêtes HTTP ponctuelles, calculs isolés, exports à la demande.</li>
+          <li>Flux chauds : événements UI, WebSocket, temps réel, état partagé (store).</li>
+          <li><code>share</code> pour partager sans replay, <code>shareReplay</code> pour rejouer la dernière valeur.</li>
+          <li><code>Subject</code> / <code>BehaviorSubject</code> pour propager un état applicatif.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="DemoRxjs__grid">
+      <div class="DemoRxjs__card">
+        <h5>Cold A</h5>
+        <pre>{{ hotCold.coldA$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Cold B (abonné tard)</h5>
+        <pre>{{ hotCold.coldB$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Hot A (share)</h5>
+        <pre>{{ hotCold.hotA$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Hot B (abonné tard)</h5>
+        <pre>{{ hotCold.hotB$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>shareReplay (abonné tard)</h5>
+        <pre>{{ hotCold.shareReplayLate$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>Subjects / multicasting</h5>
+        <pre>{{ hotCold.subjectLogs$ | async | json }}</pre>
+      </div>
+    </div>
+
+    <div class="DemoRxjs__simulatorBlock">
+      <div class="DemoRxjs__simHeader">
+        <div class="DemoRxjs__simHeaderText">
+          <h5>Simulateur chaud / froid</h5>
+          <span class="DemoRxjs__operatorTag">{{ hotColdModeControl.value || 'cold' }}</span>
+        </div>
+        <div class="DemoRxjs__controlButtons">
+          <button type="button" (click)="simulateHotCold()" [disabled]="hotColdRunning">
+            Simuler
+          </button>
+          <button type="button" class="DemoRxjs__ghostButton" (click)="clearHotColdSimulation()">
+            Réinitialiser
+          </button>
+        </div>
+      </div>
+
+      <div class="DemoRxjs__controls">
+        <label>
+          Mode
+          <select [formControl]="hotColdModeControl">
+            <option value="cold">cold</option>
+            <option value="hot">hot (share)</option>
+            <option value="shareReplay">shareReplay(1)</option>
+          </select>
+        </label>
+        <label>
+          Valeurs source (csv)
+          <input type="text" [formControl]="hotColdValues" placeholder="A,B,C,D" />
+        </label>
+        <label>
+          Intervalle entre emissions (ms)
+          <input type="number" min="0" step="10" [formControl]="hotColdInterval" />
+        </label>
+        <label>
+          Abonnement B apres (ms)
+          <input type="number" min="0" step="10" [formControl]="hotColdSubBDelay" />
+        </label>
+      </div>
+
+      <div class="DemoRxjs__simPreview">
+        <div class="DemoRxjs__chips">
+          <span class="DemoRxjs__chip" *ngFor="let item of hotColdPreview">
+            {{ item.value }} · +{{ item.delay }}ms
+          </span>
+        </div>
+        <p class="DemoRxjs__simLegend">
+          Abonne A a t0. Abonne B apres le delai. En cold, B rejoue toute la sequence. En hot, B manque les emissions deja passees.
+        </p>
+      </div>
+
+      <div class="DemoRxjs__timeline" *ngIf="hotColdLogs.length > 0">
+        <div class="DemoRxjs__timelineRow" *ngFor="let log of hotColdLogs">
+          <span class="DemoRxjs__time">{{ log.t }}ms</span>
+          <span class="DemoRxjs__lane DemoRxjs__lane--{{ log.lane }}">{{ log.lane }}</span>
+          <span class="DemoRxjs__value">{{ log.value }}</span>
+        </div>
+      </div>
+      <p class="DemoRxjs__empty" *ngIf="hotColdLogs.length === 0">
+        Lancez une simulation pour comparer les abonnements A/B.
+      </p>
+    </div>
+  </section>
+
+  <section class="DemoRxjs__section">
+    <h4>2.3.5 Transformations d'observables</h4>
+    <div class="DemoRxjs__grid">
+      <div class="DemoRxjs__card">
+        <h5>combineLatest</h5>
+        <pre>{{ combinations.combineLatest$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>merge</h5>
+        <pre>{{ combinations.merge$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>zip</h5>
+        <pre>{{ combinations.zip$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>partition</h5>
+        <pre>{{ partitions.even$ | async | json }}</pre>
+        <pre>{{ partitions.odd$ | async | json }}</pre>
+      </div>
+    </div>
+
+    <div class="DemoRxjs__simulatorBlock">
+      <div class="DemoRxjs__simHeader">
+        <div class="DemoRxjs__simHeaderText">
+          <h5>Simulateur de combinaisons</h5>
+          <span class="DemoRxjs__operatorTag">{{ combinationOperatorControl.value || 'combineLatest' }}</span>
+        </div>
+        <div class="DemoRxjs__controlButtons">
+          <button type="button" (click)="simulateCombination()" [disabled]="combinationRunning">
+            Simuler
+          </button>
+          <button type="button" class="DemoRxjs__ghostButton" (click)="clearCombinationSimulation()">
+            Réinitialiser
+          </button>
+        </div>
+      </div>
+
+      <div class="DemoRxjs__simMeta">
+        <div class="DemoRxjs__simMetaBlock">
+          <h6>Types d'opérateurs simulés</h6>
+          <ul class="DemoRxjs__inlineList">
+            <li>combineLatest</li>
+            <li>merge</li>
+            <li>zip</li>
+            <li>partition</li>
+          </ul>
+        </div>
+        <div class="DemoRxjs__simMetaBlock">
+          <h6>Présentation du type d'opérateurs RxJS</h6>
+          <p>
+            Ces opérateurs combinent plusieurs flux ou répartissent un flux en sorties distinctes,
+            avec des règles de synchronisation et d'ordre différentes.
+          </p>
+        </div>
+      </div>
+
+      <div class="DemoRxjs__simMetaBlock DemoRxjs__simMetaBlock--full">
+        <h6>Simulateurs</h6>
+        <div class="DemoRxjs__simBody">
+          <div class="DemoRxjs__controls">
+            <label>
+              Opérateur
+              <select [formControl]="combinationOperatorControl">
+                <option *ngFor="let op of combinationOperatorOptions" [value]="op.key">
+                  {{ op.label }}
+                </option>
+              </select>
+            </label>
+            <label>
+              Valeurs source A (csv)
+              <input type="text" [formControl]="combinationValuesA" placeholder="1,2,3" />
+            </label>
+            <label>
+              Intervalle A (ms)
+              <input type="number" min="0" step="10" [formControl]="combinationIntervalA" />
+            </label>
+            <label *ngIf="combinationOperatorControl.value !== 'partition'">
+              Valeurs source B (csv)
+              <input type="text" [formControl]="combinationValuesB" placeholder="A,B,C" />
+            </label>
+            <label *ngIf="combinationOperatorControl.value !== 'partition'">
+              Intervalle B (ms)
+              <input type="number" min="0" step="10" [formControl]="combinationIntervalB" />
+            </label>
+          </div>
+
+          <div class="DemoRxjs__simPreview">
+            <p class="DemoRxjs__simLegend">Source A</p>
+            <div class="DemoRxjs__chips">
+              <span class="DemoRxjs__chip" *ngFor="let item of combinationPreviewA">
+                {{ item.value }} · +{{ item.delay }}ms
+              </span>
+            </div>
+            <ng-container *ngIf="combinationOperatorControl.value !== 'partition'">
+              <p class="DemoRxjs__simLegend">Source B</p>
+              <div class="DemoRxjs__chips">
+                <span class="DemoRxjs__chip DemoRxjs__chip--muted" *ngFor="let item of combinationPreviewB">
+                  {{ item.value }} · +{{ item.delay }}ms
+                </span>
+              </div>
+            </ng-container>
+
+            <p class="DemoRxjs__simLegend" *ngIf="combinationOperatorControl.value === 'combineLatest'">
+              combineLatest émet dès que chaque source a produit au moins une valeur, puis à chaque nouvelle émission.
+            </p>
+            <p class="DemoRxjs__simLegend" *ngIf="combinationOperatorControl.value === 'merge'">
+              merge mélange les émissions des deux sources au fil de l'eau (ordre d'arrivée).
+            </p>
+            <p class="DemoRxjs__simLegend" *ngIf="combinationOperatorControl.value === 'zip'">
+              zip associe les valeurs par paire (A1 avec B1, A2 avec B2, etc.).
+            </p>
+            <p class="DemoRxjs__simLegend" *ngIf="combinationOperatorControl.value === 'partition'">
+              partition sépare la source A en deux flux (pairs/impairs).
+            </p>
+          </div>
+
+          <div class="DemoRxjs__timeline" *ngIf="combinationLogs.length > 0">
+            <div class="DemoRxjs__timelineRow" *ngFor="let log of combinationLogs">
+              <span class="DemoRxjs__time">{{ log.t }}ms</span>
+              <span class="DemoRxjs__lane DemoRxjs__lane--{{ log.lane }}">{{ log.lane }}</span>
+              <span class="DemoRxjs__value">{{ log.value }}</span>
+            </div>
+          </div>
+          <p class="DemoRxjs__empty" *ngIf="combinationLogs.length === 0">
+            Lancez une simulation pour comparer les combinaisons.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="DemoRxjs__section">
+    <h4>2.3.6 Observables d'ordre 2</h4>
+    <div class="DemoRxjs__grid">
+      <div class="DemoRxjs__card">
+        <h5>mergeMap (parallèle)</h5>
+        <pre>{{ higherOrder.mergeMap$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>concatMap (file d'attente)</h5>
+        <pre>{{ higherOrder.concatMap$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>switchMap (basculement)</h5>
+        <pre>{{ higherOrder.switchMap$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>exhaustMap (ignorance)</h5>
+        <pre>{{ higherOrder.exhaustMap$ | async | json }}</pre>
+      </div>
+    </div>
+
+    <div class="DemoRxjs__simulatorBlock">
+      <div class="DemoRxjs__simHeader">
+        <div class="DemoRxjs__simHeaderText">
+          <h5>Transformations</h5>
+        </div>
+        <div class="DemoRxjs__controlButtons">
+          <button type="button" (click)="simulateOperatorFor('transform')" [disabled]="simulationStates.transform.running">
+            Simuler
+          </button>
+          <button type="button" class="DemoRxjs__ghostButton" (click)="clearSimulationFor('transform')">
+            Réinitialiser
+          </button>
+        </div>
+      </div>
+
+      <div class="DemoRxjs__simMeta">
+        <div class="DemoRxjs__simMetaBlock">
+          <h6>Types d'opérateurs simulés</h6>
+          <ul class="DemoRxjs__inlineList">
+            <li>map</li>
+            <li>switchMap</li>
+            <li>mergeMap</li>
+            <li>concatMap</li>
+            <li>exhaustMap</li>
+          </ul>
+        </div>
+        <div class="DemoRxjs__simMetaBlock">
+          <h6>Présentation du type d'opérateurs RxJS</h6>
+          <p>
+            Les transformations modifient les valeurs ou declenchent des actions asynchrones.
+            Elles pilotent le timing et l'ordre des emissions.
+          </p>
+        </div>
+      </div>
+
+      <div class="DemoRxjs__simMetaBlock DemoRxjs__simMetaBlock--full">
+        <h6>Simulateurs</h6>
+        <div class="DemoRxjs__simBody">
+          <div class="DemoRxjs__controls">
+            <label>
+              Opérateur
+              <select [formControl]="transformOperatorControl">
+                <option *ngFor="let op of transformOperatorOptions" [value]="op.key">
+                  {{ op.label }}
+                </option>
+              </select>
+            </label>
+          </div>
+
+          <div class="DemoRxjs__params" *ngIf="transformOperatorControl.value === 'map'">
+            <label>
+              Valeurs source (csv)
+              <input type="text" [formControl]="mapValues" placeholder="1,2,3,4" />
+            </label>
+            <label>
+              Intervalle entre emissions (ms)
+              <input type="number" min="0" step="10" [formControl]="mapInterval" />
+            </label>
+          </div>
+
+          <div class="DemoRxjs__timings" *ngIf="isTimingOperator()">
+            <div class="DemoRxjs__timingGroup">
+              <span class="DemoRxjs__timingTitle">Délais source (+ms)</span>
+              <label>
+                A
+                <input type="number" min="0" step="10" [formControl]="sourceDelayA" />
+              </label>
+              <label>
+                B
+                <input type="number" min="0" step="10" [formControl]="sourceDelayB" />
+              </label>
+              <label>
+                C
+                <input type="number" min="0" step="10" [formControl]="sourceDelayC" />
+              </label>
+            </div>
+            <div class="DemoRxjs__timingGroup">
+              <span class="DemoRxjs__timingTitle">Durées inner (ms)</span>
+              <label>
+                inner(A)
+                <input type="number" min="0" step="10" [formControl]="innerDelayA" />
+              </label>
+              <label>
+                inner(B)
+                <input type="number" min="0" step="10" [formControl]="innerDelayB" />
+              </label>
+              <label>
+                inner(C)
+                <input type="number" min="0" step="10" [formControl]="innerDelayC" />
+              </label>
+            </div>
+          </div>
+
+          <div class="DemoRxjs__simPreview">
+            <div class="DemoRxjs__chips">
+              <span class="DemoRxjs__chip" *ngFor="let item of simulationStates.transform.preview.source">
+                {{ item.value }} · +{{ item.delay }}ms
+              </span>
+            </div>
+            <div class="DemoRxjs__chips" *ngIf="simulationStates.transform.preview.inner?.length">
+              <span class="DemoRxjs__chip DemoRxjs__chip--muted" *ngFor="let item of simulationStates.transform.preview.inner">
+                inner({{ item.value }}) {{ item.delay }}ms
+              </span>
+            </div>
+            <p class="DemoRxjs__simLegend" *ngIf="transformOperatorControl.value !== 'map'">
+              A/B/C sont les emissions du flux source. Le +XXms indique le delai avant chaque emission. inner(X)
+              represente la duree simulee de l'operation asynchrone declenchee par X (ex: appel API).
+            </p>
+            <p class="DemoRxjs__simLegend" *ngIf="transformOperatorControl.value === 'map'">
+              Chaque valeur est transformee par une fonction de projection avant d etre emise.
+            </p>
+            <div class="DemoRxjs__simLegend DemoRxjs__simLegend--timeline" *ngIf="simulationStates.transform.timeline.length">
+              <div *ngFor="let entry of simulationStates.transform.timeline">
+                {{ entry.value }} emet a +{{ entry.emittedAt }}ms
+                <ng-container *ngIf="entry.completesAt !== undefined">
+                  → fin approx. +{{ entry.completesAt }}ms
+                </ng-container>
+              </div>
+            </div>
+            <p class="DemoRxjs__simDesc">
+              {{ simulationStates.transform.preview.description }}
+            </p>
+          </div>
+
+          <div class="DemoRxjs__timeline" *ngIf="simulationStates.transform.logs.length > 0">
+            <div class="DemoRxjs__timelineRow" *ngFor="let log of simulationStates.transform.logs">
+              <span class="DemoRxjs__time">{{ log.t }}ms</span>
+              <span class="DemoRxjs__lane DemoRxjs__lane--{{ log.lane }}">{{ log.lane }}</span>
+              <span class="DemoRxjs__value">{{ log.value }}</span>
+            </div>
+          </div>
+          <p class="DemoRxjs__empty" *ngIf="simulationStates.transform.logs.length === 0">
+            Lancez une simulation pour visualiser les transformations dans le temps.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="DemoRxjs__section">
+    <h4>2.3.7 Gestion des erreurs</h4>
+    <div class="DemoRxjs__grid">
+      <div class="DemoRxjs__card">
+        <h5>retry</h5>
+        <pre>{{ errorHandling.retry$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>fallback</h5>
+        <pre>{{ errorHandling.fallback$ | async | json }}</pre>
+      </div>
+      <div class="DemoRxjs__card">
+        <h5>order 2 + retry/catchError</h5>
+        <pre>{{ errorHandling.higherOrder$ | async | json }}</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="DemoRxjs__section">
+    <h4>2.3.8 Tester son code avec RxJS</h4>
+    <p>
+      Exemples de tests avec TestScheduler dans
+      <code>frontend/app/services/rxjs-lab.spec.ts</code>.
+    </p>
+    <p>
+      Travaux pratiques : écrire des tests sur des Observables avec des marbles
+      (latence, erreurs, stratégies order 2).
+    </p>
+  </section>
 </section>

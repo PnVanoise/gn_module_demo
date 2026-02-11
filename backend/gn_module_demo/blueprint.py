@@ -9,6 +9,7 @@ from io import StringIO
 from urllib.parse import urlparse
 
 from flask import Blueprint, Response, current_app, g, jsonify, render_template, request, url_for
+from marshmallow import ValidationError
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, event, select
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import (
@@ -364,6 +365,21 @@ def create_individual():
     with _sql_debug("individuals-create"):
         individual = repo_create_individual(individual)
     return schema.dump(individual)
+
+
+@blueprint.route("/individuals/validate", methods=["POST"])
+@login_required
+@json_resp
+def validate_individual():
+    payload = request.get_json(silent=True)
+    if payload is None:
+        raise BadRequest("JSON body is required")
+    schema = IndividualsSchema()
+    try:
+        schema.load(payload, partial=True)
+    except ValidationError as exc:
+        return {"valid": False, "errors": exc.messages}, 422
+    return {"valid": True}
 
 
 @blueprint.route("/individuals/<int:id_individual>", methods=["PUT"])

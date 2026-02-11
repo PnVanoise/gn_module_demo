@@ -26,6 +26,7 @@ class TaxrefAutocompleteSchema(Schema):
 
 taxref_autocomplete_schema = TaxrefAutocompleteSchema(many=True)
 ADDITIONAL_DATA_MANDATORY = ["age", "sex"]
+ADDITIONAL_DATA_ALLOWED_SEX = {"M", "F", "U"}
 
 
 class IndividualsSchema(ma.SQLAlchemyAutoSchema):
@@ -43,14 +44,34 @@ class IndividualsSchema(ma.SQLAlchemyAutoSchema):
 
     @validates("additional_data")
     def validate_additional_data(self, value):
-        if value is not None and not isinstance(value, dict):
+        if value is None:
+            return
+        if not isinstance(value, dict):
             raise ValidationError("additional_data must be a JSON object (dict).")
-        cd_nom_payload = value.get("cd_nom")
-        if cd_nom_payload is not None:
-            cd_nom_additional = db.select(Taxref).filter_by(cd_nom=cd_nom_payload)
-            print(cd_nom_additional)
 
+        errors = []
         if not all(field in value.keys() for field in ADDITIONAL_DATA_MANDATORY):
-            raise ValidationError(
-                f"additional_data must contains at least one of these fields: {ADDITIONAL_DATA_MANDATORY}."
+            errors.append(
+                f"additional_data doit contenir tous ces champs : {ADDITIONAL_DATA_MANDATORY}."
             )
+
+        age = value.get("age")
+        if age is None:
+            errors.append("additional_data.age est obligatoire.")
+        elif isinstance(age, bool) or not isinstance(age, int):
+            errors.append("additional_data.age doit etre un entier.")
+        elif age < 0:
+            errors.append("additional_data.age doit etre >= 0.")
+
+        sex = value.get("sex")
+        if sex is None or (isinstance(sex, str) and sex.strip() == ""):
+            errors.append("additional_data.sex est obligatoire.")
+        elif not isinstance(sex, str):
+            errors.append("additional_data.sex doit etre une chaine.")
+        else:
+            if sex not in ADDITIONAL_DATA_ALLOWED_SEX:
+                allowed = ", ".join(sorted(ADDITIONAL_DATA_ALLOWED_SEX))
+                errors.append(f"additional_data.sex doit etre parmi : {allowed}.")
+
+        if errors:
+            raise ValidationError(errors)
