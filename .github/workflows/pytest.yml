@@ -60,6 +60,7 @@ jobs:
         run: |
           psql -h localhost -U geonatadmin -d geonature2db -tc 'CREATE EXTENSION "hstore";'
           psql -h localhost -U geonatadmin -d geonature2db -tc 'CREATE EXTENSION "uuid-ossp";'
+          psql -h localhost -U geonatadmin -d geonature2db -tc 'CREATE EXTENSION "ltree";'
           psql -h localhost -U geonatadmin -d geonature2db -tc 'CREATE EXTENSION "pg_trgm";'
           psql -h localhost -U geonatadmin -d geonature2db -tc 'CREATE EXTENSION "unaccent";'
         env:

@@ -39,6 +39,7 @@ where = ["backend"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
+addopts = "--cov --cov-report=xml --cov-fail-under=80"
 testpaths = ["backend"]
 markers = [
   "unit: tests unitaires rapides",
