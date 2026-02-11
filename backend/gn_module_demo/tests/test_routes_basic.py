@@ -3,6 +3,7 @@ from flask import url_for
 from pypnusershub.tests.utils import logged_user
 from geonature.utils.env import db
 
+
 def test_demo_list_returns_list(client, users):
     with logged_user(client, users["admin_user"]):
         response = client.get(url_for("demo.list_demos"))
@@ -26,4 +27,3 @@ class TestIndividuals:
         with logged_user(self.client, users["admin_user"]):
             response = self.client.get(url_for("demo.list_individuals", id_individuals=1))
         assert response.status_code == 200
-        

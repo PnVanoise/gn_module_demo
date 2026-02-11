@@ -11,9 +11,7 @@ def test_mock_calls_route_uses_repo_for_each_strategy(admin_client, monkeypatch)
     mock_repo = Mock(return_value=[object(), object(), object()])
     monkeypatch.setattr(demo_blueprint_module, "repo_list_individuals_with_taxref", mock_repo)
 
-    response = admin_client.get(
-        url_for("demo.demo_mock_calls", strategy=["joined", "selectin"])
-    )
+    response = admin_client.get(url_for("demo.demo_mock_calls", strategy=["joined", "selectin"]))
 
     assert response.status_code == 200
     payload = response.get_json()
