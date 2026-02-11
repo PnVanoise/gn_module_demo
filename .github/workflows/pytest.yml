@@ -95,13 +95,13 @@ jobs:
           geonature db upgrade ref_geo_inpn_grids_10@head
         env:
           GEONATURE_CONFIG_FILE: dependencies/GeoNature/config/test_config.toml
-      - name: Install export module backend
+      - name: Install module demo backend
         run: |
           pip install -r requirements-dev.in
           pip install .
-      - name: Install import module database
+      - name: Install module demo database
         run: |
-          geonature upgrade-modules-db DEMOS
+          geonature upgrade-modules-db DEMO
         env:
           GEONATURE_CONFIG_FILE: dependencies/GeoNature/config/test_config.toml
       - name: Test with pytest

@@ -34,7 +34,9 @@ def upgrade():
         schema=SCHEMA_NAME,
     )
 
-    op.execute(sa.text(f"""
+    op.execute(
+        sa.text(
+            f"""
             INSERT INTO {SCHEMA_NAME}.{TABLE_NAME} (name_individual, cd_nom)
             SELECT v.name_individual,
                    (
@@ -49,7 +51,9 @@ def upgrade():
                     (2, 'Individu B'),
                     (3, 'Individu C')
             ) AS v (idx, name_individual)
-            """))
+            """
+        )
+    )
 
 
 def downgrade():
