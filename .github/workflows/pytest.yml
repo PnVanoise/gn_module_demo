@@ -30,7 +30,7 @@ jobs:
         image: postgis/postgis:${{ matrix.postgres-version }}-${{ matrix.postgis-version }}
         env:
           POSTGRES_DB: geonature2db
-          POSTGRES_PASSWORD: geonatpasswd
+          POSTGRES_PASSWORD: geonatadmin
           POSTGRES_USER: geonatadmin
         ports:
           - 5432:5432
@@ -55,7 +55,7 @@ jobs:
         run: |
           psql -h localhost -U geonatadmin -d geonature2db -tc 'CREATE EXTENSION "postgis_raster";'
         env:
-          PGPASSWORD: geonatpasswd
+          PGPASSWORD: geonatadmin
       - name: Add database extensions
         run: |
           psql -h localhost -U geonatadmin -d geonature2db -tc 'CREATE EXTENSION "hstore";'
@@ -63,7 +63,7 @@ jobs:
           psql -h localhost -U geonatadmin -d geonature2db -tc 'CREATE EXTENSION "pg_trgm";'
           psql -h localhost -U geonatadmin -d geonature2db -tc 'CREATE EXTENSION "unaccent";'
         env:
-          PGPASSWORD: geonatpasswd
+          PGPASSWORD: geonatadmin
       - uses: actions/checkout@v2
         with:
           submodules: recursive
