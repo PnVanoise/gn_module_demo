@@ -8,6 +8,7 @@ import { DemoComponent } from '../demo/demo.component';
 import { DemoService } from '../../services/demo.service';
 
 @Component({
+  selector: 'pnx-demo-list',
   standalone: true,
   templateUrl: 'demo-list.component.html',
   styleUrls: ['./demo-list.component.scss'],

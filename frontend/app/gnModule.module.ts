@@ -8,15 +8,26 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DemoService } from './services/demo.service';
 import { DemoListComponent } from './components/demo-list/demo-list.component';
 import { DemoPageComponent } from './components/demo-page/demo-page.component';
+import { IndividualService } from './services/individual.service';
+import { IndividualListComponent } from './components/individual-list/individual-list.component';
+import { IndividualComponent } from './components/individual/individual.component';
 
 export const routes: Routes = [
   {
-    path: "",
+    path: "d/",
     component: DemoListComponent,
   },
   {
-    path: ":id_demo",
+    path: "d/:id_demo",
     component: DemoPageComponent,
+  },
+  {
+    path: "ind",
+    component: IndividualListComponent,
+  },
+  {
+    path: "ind/:id_individual",
+    component: IndividualComponent,
   },
 ];
 
@@ -32,9 +43,11 @@ export const routes: Routes = [
     RouterModule.forChild(routes),
     // Module component
     DemoListComponent,
-    DemoPageComponent
+    DemoPageComponent,
+    IndividualListComponent,
+    // IndividualComponent,
   ],
-  providers: [DemoService],
+  providers: [DemoService, IndividualService],
   bootstrap: [],
 })
 export class GeonatureModule {}
