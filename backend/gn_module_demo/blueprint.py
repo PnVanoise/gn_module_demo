@@ -62,24 +62,35 @@ def demo(id_demo):
 @login_required
 @json_resp
 def list_indiv():
-    # Un schéma doit être créé
-    schema = IndividualSchema(many=True, only=["taxref"])
+    # Un schéma doit être créé : version sans nomenclatures
+    # schema = IndividualSchema(many=True, only=["taxref"])
+    # query = db.select(Individual).options(joinedload(Individual.taxref))
 
-    query = db.select(Individual).options(joinedload(Individual.taxref))
+    # Un schéma doit être créé : version avec nomenclatures
+    nomenclatures = list(Individual.__nomenclatures__)
 
+    # Construire la liste des champs de type nomenclature à sérialiser
+    nomenclatures_fields = [n for n in nomenclatures]
+      
+    # Construire le schéma en incluant dynamiquement seulement les champs de type nomenclature et taxref
+    schema = IndividualSchema(many=True, only=["taxref"] + nomenclatures_fields)
+
+    # Construire la requête en incluant les jointures nécessaires pour éviter les problèmes de N+1
+    query = db.select(Individual).options(joinedload(Individual.taxref),*[joinedload(getattr(Individual, f)) for f in nomenclatures_fields])
+    
     # Passer la requête en chaîne de caractères pour les logs
     sql = query.compile(
         dialect=postgresql.dialect(),
         compile_kwargs={"literal_binds": True},
     )
 
-    print(f"-- DEBUG ------- {sql}")
+    # print(f"-- DEBUG ------- {sql}")
 
     indivs = db.session.execute(query).scalars().all()
 
-    print(f"-- DEBUG ------- indivs[n] type : {type(indivs[0])}")
-    print(f"-- DEBUG ------- indivs log: {indivs}")
-    print(f"-- DEBUG ------- tous les indivs: {vars(indivs[0].taxref)}")
+    # print(f"-- DEBUG ------- indivs[n] type : {type(indivs[0])}")
+    # print(f"-- DEBUG ------- indivs log: {indivs}")
+    # print(f"-- DEBUG ------- tous les indivs: {vars(indivs[0].taxref)}")
 
     return schema.dump(indivs)
 

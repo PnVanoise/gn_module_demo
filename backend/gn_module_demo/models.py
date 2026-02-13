@@ -3,7 +3,10 @@ from sqlalchemy.dialects.postgresql import JSONB
 
 from apptax.taxonomie.models import Taxref
 
-from sqlalchemy.ext.hybrid import hybrid_property
+# from sqlalchemy.ext.hybrid import hybrid_property
+
+from pypnnomenclature.models import TNomenclatures as Nomenclature
+from pypnnomenclature.utils import NomenclaturesMixin
 
 SCHEMA_NAME = "gn_demo"
 
@@ -20,7 +23,7 @@ class Demo(DB.Model):
     )
 
 
-class Individual(DB.Model):
+class Individual(NomenclaturesMixin, DB.Model):
     __tablename__ = "t_individuals"
     __table_args__ = {"schema": SCHEMA_NAME}
 
@@ -35,6 +38,16 @@ class Individual(DB.Model):
         "name",
         DB.Text,
         nullable=True,
+    )
+
+    id_nomenclature_sex = DB.Column(
+        DB.Integer, 
+        DB.ForeignKey(Nomenclature.id_nomenclature)
+    )
+
+    nomenclature_sex = DB.relationship(
+        Nomenclature,
+        foreign_keys=[id_nomenclature_sex]
     )
 
     cd_nom = DB.Column("cd_nom", DB.Integer, DB.ForeignKey(Taxref.cd_nom))

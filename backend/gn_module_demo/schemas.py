@@ -6,6 +6,8 @@ from apptax.taxonomie.models import Taxref
 
 from .models import Individual
 
+from pypnnomenclature.utils import NomenclaturesConverter
+
 ADDITIONAL_DATA_ALLOWED_KEYS = ["collier", "taille_cm"]
 
 class IndividualSchema(SmartRelationshipsMixin, ma.SQLAlchemyAutoSchema):
@@ -14,6 +16,7 @@ class IndividualSchema(SmartRelationshipsMixin, ma.SQLAlchemyAutoSchema):
         include_fk = True
         load_instance = True
         sqla_session = db.session
+        model_converter = NomenclaturesConverter
 
     taxref = ma.Nested(TaxrefSchema)
 
@@ -34,7 +37,7 @@ class IndividualSchema(SmartRelationshipsMixin, ma.SQLAlchemyAutoSchema):
         if cd_nom_payload is not None:
             cd_nom_additional = db.session.execute(
                 db.select(Taxref).filter_by(cd_nom=cd_nom_payload)
-            ).scalars.one_or_none()
+            ).scalars().one_or_none()
 
             if cd_nom_additional is None:
                 raise ValidationError(

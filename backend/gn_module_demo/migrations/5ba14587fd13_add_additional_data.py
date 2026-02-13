@@ -34,7 +34,7 @@ def upgrade():
         column("id_individual", sa.Integer),
         column("name", sa.String),
         column("cd_nom", sa.Integer),
-        column("additional_data", sa.JSON),
+        column("additional_data", JSONB),
         schema=SCHEMA_NAME,
     )
 

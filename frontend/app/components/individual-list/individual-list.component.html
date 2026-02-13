@@ -1,0 +1,16 @@
+<div class="IndivList" [ngClass]="{ 'is-empty': individuals.length === 0 }">
+  <div class="IndivList__empty" *ngIf="individuals.length === 0; else list">
+    No demo available yet.
+  </div>
+  <ng-template #list>
+    <a
+      class="IndivList__item"
+      *ngFor="let indiv of individuals; let i = index"
+      [routerLink]="[indiv.id_individual]"
+      [ngClass]="{ 'is-odd': i % 2 === 1}"
+    >
+      <pnx-individual [individual]="indiv"></pnx-individual>
+      <span class="IndivList__cta">Détails</span>
+    </a>
+  </ng-template>
+</div>

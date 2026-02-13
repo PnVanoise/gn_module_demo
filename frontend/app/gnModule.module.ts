@@ -5,18 +5,18 @@ import { HttpClientXsrfModule } from '@angular/common/http';
 import { GN2CommonModule } from '@geonature_common/GN2Common.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { DemoService } from './services/demo.service';
-import { DemoListComponent } from './components/demo-list/demo-list.component';
-import { DemoPageComponent } from './components/demo-page/demo-page.component';
+import { IndividualService } from './services/individual.service';
+import { IndividualListComponent } from './components/individual-list/individual-list.component';
+import { IndividualDetailComponent } from './components/individual-detail/individual-detail.component';
 
 export const routes: Routes = [
   {
     path: "",
-    component: DemoListComponent,
+    component: IndividualListComponent,
   },
   {
-    path: ":id_demo",
-    component: DemoPageComponent,
+    path: ":id_individual",
+    component: IndividualDetailComponent,
   },
 ];
 
@@ -30,11 +30,12 @@ export const routes: Routes = [
     GN2CommonModule,
     NgbModule,
     RouterModule.forChild(routes),
+
     // Module component
-    DemoListComponent,
-    DemoPageComponent
+    IndividualDetailComponent,
+    IndividualListComponent,
   ],
-  providers: [DemoService],
+  providers: [IndividualService],
   bootstrap: [],
 })
 export class GeonatureModule {}

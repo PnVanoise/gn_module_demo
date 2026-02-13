@@ -1,4 +1,4 @@
-# Doc pour le developement dans l'environnement de GeoNature
+# Doc du PNV pour le developement dans l'environnement de GeoNature
 
 L'idée de cette doc est de servir de mémo, de lister différentes astuces ...
 
@@ -68,6 +68,46 @@ logger = logging.getLogger(__name__)
 
 logger.info("SQL: %s", sql) # ou logger.debug selon le niveau souhaité
 ```
+
+### Alembic
+
+#### Etat des migrations
+
+```shell
+# Etat de toute la BDD
+geonature db status
+
+# Etat d'une branche de la BDD
+geonature db status <branch_name>
+```
+
+#### Générer un nouveau fichier de version
+
+```shell
+geonature db revision -m "<revision_name>" --head <branch_name>@head
+```
+
+L'option `--head` indique à partir de quel endroit de l'arbre des révisions doit être appliquée celle-ci. Par exemple, la valeur `demo@head`, indique qu'elle doit être appliquée à la tête de la branche `demo` (en dernier).
+
+Cette commande crée donc le fichier `.../revisions/<serial>_<revision_name>.py`.
+
+> [!NOTE] 
+> Pour la 1ère révision d'un modèle, il est impératif de préciser l'option `--branch-label <nom_branche>` afin que la variable `branch_labels` du fichier de migration soit renseigné (cela pouvant être fait à postériori directement dans le fichier avant de soumettre la migration à alembic).
+
+#### Soumettre ou retirer une révision
+
+Cette commande applique la dernière migration en jouant la fonction python `upgrade()` :
+
+```shell
+geonature db upgrade <branch_name>@head
+```
+
+Cette commande retire la dernière migration en jouant la fonction python `downgrade()` de la dernière migration appliquée:
+
+```shell
+geonature db downgrade <branch_name>@-1
+```
+
 
 ### SQLAlchemy
 
@@ -217,7 +257,7 @@ class IndividualSchema(ma.SQLAlchemyAutoSchema):
 
 ##### Mixin or not ?
 
-`SmartRelationshipsMixin` force à ne pas charger les relations ships et c'est cette méthode qui est préconisée par les développeurs.
+`SmartRelationshipsMixin` force à ne pas charger les relations ships et c'est cette méthode qui est préconisée par les mainteneurs de GeoNature. (cf <https://docs.geonature.fr/development.html#gestion-des-relationships>).
 
 Les 2 exemples suivants démontrent comment utiliser 2 méthodes pour sérialiser le champ `taxref` du model `Individual` qui est une relationship définie par la ForeignKey sur le champ `cd_nom`
 
