@@ -1,0 +1,34 @@
+<!-- <div class="IndividualList" *ngIf="indivs && indivs.length > 0">
+  <h3>Individus</h3>
+  <ul>
+    <li *ngFor="let indiv of indivs">
+      <pnx-individual [indiv]="indiv"></pnx-individual>
+    </li>
+  </ul>
+</div>
+<div class="IndividualList__empty" *ngIf="!indivs || indivs.length === 0">
+  No individual available yet.
+</div>
+
+
+
+
+
+ -->
+
+<div class="IndividualList" [ngClass]="{ 'is-empty': indivs.length === 0 }">
+  <div class="IndividualList__empty" *ngIf="indivs.length === 0; else list">
+    No indiv available yet.
+  </div>
+  <ng-template #list>
+    <a
+      class="IndividualList__item"
+      *ngFor="let indiv of indivs; let i = index"
+      [routerLink]="[indiv.id_individual]"
+      [ngClass]="{ 'is-odd': i % 2 === 1 }"
+    >
+      <pnx-individual [indiv]="indiv"></pnx-individual>
+      <span class="IndividualLists__cta">Voir la fiche</span>
+    </a>
+  </ng-template>
+</div>
