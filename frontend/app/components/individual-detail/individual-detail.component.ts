@@ -35,6 +35,7 @@ export class IndividualDetailComponent implements OnInit {
     this.routeIdSnapshot = this.parseId(this._route.snapshot.paramMap.get('id_individual'));
     console.log('routeIdSnapshot:', this.routeIdSnapshot);
 
+    // pipe : pour traiter un enchainement de fonctions sur les observables
     this.routeIdParams$ = this._route.paramMap.pipe(
       map((params) => this.parseId(params.get('id_individual'))),
       distinctUntilChanged(),
@@ -53,33 +54,29 @@ export class IndividualDetailComponent implements OnInit {
         );
       }),
       tap((individual) => {
-        this.individual = individual;
+        console.log('Received individual:', individual);
+        this.individual = individual[0];
       }),
       shareReplay(1)
     );
   }
 
-  // ngOnInit() {
-
-  //   this.routeIdSnapshot = this.parseId(this._route.snapshot.paramMap.get('id_individual'));
-  //   console.log('routeIdSnapshot:', this.routeIdSnapshot);
-
-  //   this.routeIdParams$ = this._route.paramMap.pipe(
-  //     map((params) => this.parseId(params.get('id_individual'))),
-  //     distinctUntilChanged(),
-  //     tap((id) => console.log('Emitted ID:', id)) // Log the emitted values
-  //   );
-
-  //   this.routeIdParams$
-  //     .pipe(
-  //       switchMap(id => this._individualService.getIndividual(id))
-  //     )
-  //     .subscribe(individual => {
-  //       this.individual = individual;
-  //       console.log('Individual:',individual)
-  //     }
-  //   );
-  // }
+  ngOnInit() {
+    this._route.paramMap.pipe(
+      map((params) => this.parseId(params.get('id_individual'))),
+      distinctUntilChanged(), // Only proceed if the ID has changed
+      tap((id) => console.log('Emitted ID:', id)), // Log the emitted values
+      switchMap((id) => { // SwitchMap : pour annuler la requete en cours si une nouvelle valeur arrive
+        if (id === null) {
+          return of(null);
+        }
+        console.log('Fetching individual with id:', id);
+        return this._individualService.getIndividual(id).pipe(
+          catchError(() => of(null))
+        );
+      })
+    )
+  }
 
   private parseId(rawId: string | null): number | null {
     if (rawId === null) {

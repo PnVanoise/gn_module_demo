@@ -14,15 +14,15 @@
         <div class="IndivPage__label">individual$ (async)</div>
         <div class="IndivPage__value">{{ (individual$ | async)?.id_individual }}</div>
       </div>
-      <!-- <div class="IndivPage__card">
-        <div class="IndivPage__label">demo (subscription)</div>
-        <div class="IndivPage__value">{{ demo?.id_demo }}</div>
-      </div> -->
+      <div class="IndivPage__card">
+        <div class="IndivPage__label">individual (subscription)</div>
+        <div class="IndivPage__value">{{ individual?.id_individual }}</div>
+      </div>
     </div>
-    <!-- <div
+    <div
       class="IndivPage__switch"
-      [ngStyle]="{ 'border-color': demo ? '#2d9c3c' : '#c74848' }"
-      [ngSwitch]="demo ? 'loaded' : 'empty'"
+      [ngStyle]="{ 'border-color': individual ? '#2d9c3c' : '#c74848' }"
+      [ngSwitch]="individual ? 'loaded' : 'empty'"
     >
       <span *ngSwitchCase="'loaded'">state: loaded</span>
       <span *ngSwitchDefault>state: empty</span>
@@ -31,8 +31,12 @@
       <li *ngFor="let step of statusSteps; let i = index" [ngClass]="{ 'is-active': i === 1 }">
         {{ step }}
       </li>
-    </ul> -->
-
+    </ul>
   </section>
-  <pnx-individual [individual]="individual"></pnx-individual>
+  <h3>Détails</h3>
+  <p>ID: {{ individual?.id_individual }}</p>
+  <p>Nom: {{ individual?.name }}</p>
+  <p>CD Nom: {{ individual?.cd_nom }}</p>
+  <p>Sexe: {{ individual?.id_nomenclature_sex }}</p>
+  <p>Additional fields: {{ individual?.additional_data }}</p>
 </div>
