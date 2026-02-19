@@ -17,18 +17,25 @@
  -->
 
 <div class="IndividualList" [ngClass]="{ 'is-empty': indivs.length === 0 }">
+  <div class="IndividualList__header">
+    <a class="IndividualList__add" [routerLink]="['add']">Ajouter un individu</a>
+  </div>
   <div class="IndividualList__empty" *ngIf="indivs.length === 0; else list">
     No indiv available yet.
   </div>
   <ng-template #list>
-    <a
+    <div
       class="IndividualList__item"
       *ngFor="let indiv of indivs; let i = index"
-      [routerLink]="[indiv.id_individual]"
       [ngClass]="{ 'is-odd': i % 2 === 1 }"
     >
-      <pnx-individual [indiv]="indiv"></pnx-individual>
-      <span class="IndividualLists__cta">Voir la fiche</span>
-    </a>
+      <a class="IndividualList__content" [routerLink]="[indiv.id_individual]">
+        <pnx-individual-list-item [indiv]="indiv"></pnx-individual-list-item>
+      </a>
+      <div class="IndividualList__actions">
+        <a class="btn btn-sm btn-outline-primary" [routerLink]="['edit', indiv.id_individual]">Modifier</a>
+        <button class="btn btn-sm btn-outline-danger" (click)="delete(indiv.id_individual); $event.stopPropagation();">Supprimer</button>
+      </div>
+    </div>
   </ng-template>
 </div>

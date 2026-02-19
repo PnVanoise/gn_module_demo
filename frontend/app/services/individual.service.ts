@@ -22,4 +22,22 @@ export class IndividualService {
       `${this._config.API_ENDPOINT}/${this._moduleService.currentModule.module_url}/indiv/${id_individual}`
     );
   }
+  createIndividual(individual: Partial<Individual>): Observable<Individual> {
+    return this._http.post<Individual>(
+      `${this._config.API_ENDPOINT}/${this._moduleService.currentModule.module_url}/indiv`,
+      individual
+    );
+  }
+  updateIndividual(id_individual: number, individual: Partial<Individual>): Observable<Individual> {
+    return this._http.put<Individual>(
+      `${this._config.API_ENDPOINT}/${this._moduleService.currentModule.module_url}/indiv/${id_individual}`,
+      individual
+    );
+  }
+
+  deleteIndividual(id_individual: number): Observable<void> {
+    return this._http.delete<void>(
+      `${this._config.API_ENDPOINT}/${this._moduleService.currentModule.module_url}/indiv/${id_individual}`
+    );
+  }
 }

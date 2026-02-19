@@ -1,0 +1,20 @@
+<div class="IndividualPage" *ngIf="indiv">
+  <h2>Individu n°{{ indiv.id_individual }}</h2>
+  <dl>
+    <dt>Nom scientifique</dt>
+    <dd>{{ indiv.individual_name }}</dd>
+
+    <dt>CD Nom</dt>
+    <dd>{{ indiv.cd_nom }}</dd>
+
+    <dt>Taxref</dt>
+    <dd>
+      {{ indiv.taxref.nom_vern }} — {{ indiv.taxref.famille }} ({{ indiv.taxref.classe }})
+    </dd>
+
+    <dt>Additional data</dt>
+    <dd>
+      <pre>{{ indiv.additional_data | json }}</pre>
+    </dd>
+  </dl>
+</div>

@@ -11,10 +11,14 @@ import { DemoPageComponent } from './components/demo-page/demo-page.component';
 import { IndividualService } from './services/individual.service';
 import { IndividualListComponent } from './components/individual-list/individual-list.component';
 import { IndividualComponent } from './components/individual/individual.component';
+import { IndividualListItemComponent } from './components/individual-list-item/individual-list-item.component';
+import { IndividualPageComponent } from './components/individual-page/individual-page.component';
+import { IndividualAddComponent } from './components/individual-add/individual-add.component';
+import { IndividualFormComponent } from './components/individual-form/individual-form.component';
 
 export const routes: Routes = [
   {
-    path: "d/",
+    path: "d",
     component: DemoListComponent,
   },
   {
@@ -23,11 +27,24 @@ export const routes: Routes = [
   },
   {
     path: "ind",
-    component: IndividualListComponent,
-  },
-  {
-    path: "ind/:id_individual",
-    component: IndividualComponent,
+    children: [
+      {
+        path: "",
+        component: IndividualListComponent,
+      },
+      {
+        path: "add",
+        component: IndividualFormComponent,
+      },
+      {
+        path: "edit/:id_individual",
+        component: IndividualFormComponent,
+      },
+      {
+        path: ":id_individual",
+        component: IndividualPageComponent,
+      },
+    ],
   },
 ];
 
@@ -45,7 +62,11 @@ export const routes: Routes = [
     DemoListComponent,
     DemoPageComponent,
     IndividualListComponent,
-    // IndividualComponent,
+    IndividualAddComponent,
+    IndividualFormComponent,
+    IndividualComponent,
+    IndividualListItemComponent,
+    IndividualPageComponent,
   ],
   providers: [DemoService, IndividualService],
   bootstrap: [],

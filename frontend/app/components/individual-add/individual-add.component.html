@@ -1,0 +1,91 @@
+<section class="Individual">
+  <h3>Creation d'un individu (Reactive Forms)</h3>
+  <form [formGroup]="form" (ngSubmit)="submit()" data-qa="demo-form">
+    <div class="row"
+        style="height: 70px !important">
+      <div class="col-4">
+        <small>Nom</small>
+        <input class="form-control form-control-sm" type="text" formControlName="individual_name" />
+        <div class="error" *ngIf="form.get('individual_name')?.touched && form.get('individual_name')?.invalid">
+          Le nom est requis (max 80 caracteres).
+        </div>
+      </div>
+      <div class="col-1"></div>
+      
+      <div class="col-4">
+        <pnx-taxonomy
+          label="{{ 'Occtax.Taxon.NomCite' | translate }}"
+          [parentFormControl]="form.get('cd_nom_temp')"
+          (onChange)="taxonSelected($event)"
+          [charNumber]="3"
+          [listLength]="10"
+          [displayAdvancedFilters]="false"
+          displayedLabel="search_name"
+        ></pnx-taxonomy>
+        <div class="error" *ngIf="form.get('cd_nom')?.touched && form.get('cd_nom')?.invalid">
+          Selectionnez une espece (cd_nom requis).
+        </div>
+      </div>
+    </div>
+   
+    <div class="row">
+      <div class="col-3" >
+        <pnx-nomenclature
+          label="Sexe:"
+          codeNomenclatureType="SEXE"
+          [parentFormControl]="form.get('sex')" />
+        <div class="error" *ngIf="form.get('sex')?.touched && form.get('sex')?.invalid">
+          Le sexe est requis.
+        </div>
+      </div>
+
+      <div class="col-3">
+        <small>Annee de naissance</small>
+        <input class="form-control form-control-sm" type="number" formControlName="birth_year" />
+        <div class="error" *ngIf="form.get('birth_year')?.touched && form.get('birth_year')?.invalid">
+          L'annee de naissance est requise.
+        </div>
+      </div>
+    
+      <div class="col-3">
+        <small>Surname</small>
+        <input class="form-control form-control-sm" type="text" formControlName="surname" />
+        <div class="error" *ngIf="form.get('surname')?.touched && form.get('surname')?.invalid">
+          Le surname est requis (max 80 caracteres).
+        </div>
+      </div>
+    </div>
+
+
+    <div
+      class="text-center"
+      style="margin-top: 10px"
+    >
+      <ng-container>
+        <a
+          class="btn btn-outline-warning uppercase mr-1"
+          role="button"
+          [routerLink]="['/demo/ind']"
+          matTooltip="Annuler la creation de l'individu et revenir à la liste"
+        >
+          Annuler
+        </a>
+        <button
+          type="submit"
+          mat-raised-button
+          data-qa="pnx-occtax-releve-submit-btn"
+          class="button-success uppercase"
+          matTooltip="Enregistrer le relevé et saisir les taxons"
+          [disabled]="saving || form.invalid"
+        >
+          Enregistrer et saisir des taxons
+        </button>
+      </ng-container>
+    </div>
+  </form>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <div class="success" *ngIf="created">
+    Individu cree: {{ created.id_individual }} - {{ created.individual_name }} (cd_nom: {{ created.cd_nom }})
+  </div>
+</section>

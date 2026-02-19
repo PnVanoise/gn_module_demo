@@ -1,0 +1,27 @@
+.Individual {
+  font-size: 1.5rem;
+  padding: 0.5rem 0;
+}
+.taxref {
+  color: #666;
+  font-size: 1.2rem;
+}
+
+/* Make form controls inherit the component font-size so input/select text matches labels */
+.Individual input,
+.Individual select,
+.Individual textarea,
+.Individual .form-control {
+  font-size: inherit;
+}
+
+/* Stronger rule for taxonomy widget input (Bootstrap's .form-control-sm may override) */
+.Individual pnx-taxonomy .input-group .form-control,
+.Individual pnx-taxonomy .form-control,
+.Individual pnx-taxonomy input.form-control-sm,
+.Individual pnx-taxonomy input,
+.Individual pnx-taxonomy input.form-control {
+  /* explicit size to match labels and other inputs */
+  font-size: 1.5rem !important;
+  line-height: 1.2 !important;
+}

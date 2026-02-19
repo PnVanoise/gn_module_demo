@@ -7,6 +7,15 @@ export interface Taxref {
 
 export interface Individual {
   id_individual: number;
-  label: string;
   taxref: Taxref;
+  individual_name: string;
+  cd_nom: number;
+  additional_data: AdditionalData;
+}
+
+export interface AdditionalData {
+  birth_year?: number;
+  sex?: string;
+  surname?: string;
+  [key: string]: any;
 }

@@ -1,0 +1,51 @@
+<section class="Individual">
+  <h3 *ngIf="!editingId">Créer un individu</h3>
+  <h3 *ngIf="editingId">Modifier l'individu {{ editingId }}</h3>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="row">
+      <div class="col-6">
+        <small>Nom</small>
+        <input class="form-control form-control-sm" type="text" formControlName="individual_name" />
+      </div>
+        <div class="col-6">
+          <!-- Taxonomy selector: drives cd_nom via cd_nom_temp and taxonSelected -->
+          <pnx-taxonomy
+            label="{{ 'Occtax.Taxon.NomCite' | translate }}"
+            [parentFormControl]="form.get('cd_nom_temp')"
+            (onChange)="taxonSelected($event)"
+            [charNumber]="3"
+            [listLength]="10"
+            [displayAdvancedFilters]="false"
+            displayedLabel="search_name"
+          ></pnx-taxonomy>
+          <div class="error" *ngIf="form.get('cd_nom')?.touched && form.get('cd_nom')?.invalid">
+            Selectionnez une espece (cd_nom requis).
+          </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div class="col-4">
+        <pnx-nomenclature
+          label="Sexe:"
+          codeNomenclatureType="SEXE"
+          [parentFormControl]="form.get('sex')" />
+        <div class="error" *ngIf="form.get('sex')?.touched && form.get('sex')?.invalid">
+          Le sexe est requis.
+        </div>
+      </div>
+      <div class="col-4">
+        <small>Annee de naissance</small>
+        <input class="form-control form-control-sm" type="number" formControlName="birth_year" />
+      </div>
+      <div class="col-4">
+        <small>Surname</small>
+        <input class="form-control form-control-sm" type="text" formControlName="surname" />
+      </div>
+    </div>
+    <div class="text-center" style="margin-top:10px">
+        <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">Enregistrer</button>
+        <button type="button" class="btn btn-secondary" (click)="cancel()">Annuler</button>
+    </div>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </form>
+</section>
