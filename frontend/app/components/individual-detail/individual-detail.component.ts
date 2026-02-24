@@ -48,7 +48,7 @@ export class IndividualDetailComponent implements OnInit {
         if (id === null) {
           return of(null);
         }
-        console.log('Fetching individual with id:', id);
+
         return this._individualService.getIndividual(id).pipe(
           catchError(() => of(null))
         );
@@ -61,22 +61,22 @@ export class IndividualDetailComponent implements OnInit {
     );
   }
 
-  ngOnInit() {
-    this._route.paramMap.pipe(
-      map((params) => this.parseId(params.get('id_individual'))),
-      distinctUntilChanged(), // Only proceed if the ID has changed
-      tap((id) => console.log('Emitted ID:', id)), // Log the emitted values
-      switchMap((id) => { // SwitchMap : pour annuler la requete en cours si une nouvelle valeur arrive
-        if (id === null) {
-          return of(null);
-        }
-        console.log('Fetching individual with id:', id);
-        return this._individualService.getIndividual(id).pipe(
-          catchError(() => of(null))
-        );
-      })
-    )
-  }
+  // ngOnInit() {
+  //   this._route.paramMap.pipe(
+  //     map((params) => this.parseId(params.get('id_individual'))),
+  //     distinctUntilChanged(), // Only proceed if the ID has changed
+  //     tap((id) => console.log('Emitted ID:', id)), // Log the emitted values
+  //     switchMap((id) => { // SwitchMap : pour annuler la requete en cours si une nouvelle valeur arrive
+  //       if (id === null) {
+  //         return of(null);
+  //       }
+  //       console.log('Fetching individual with id:', id);
+  //       return this._individualService.getIndividual(id).pipe(
+  //         catchError(() => of(null))
+  //       );
+  //     })
+  //   )
+  // }
 
   private parseId(rawId: string | null): number | null {
     if (rawId === null) {

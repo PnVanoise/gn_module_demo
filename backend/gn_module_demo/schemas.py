@@ -1,4 +1,5 @@
 from geonature.utils.env import db, ma
+from utils_flask_sqla_geo.schema import GeoAlchemyAutoSchema,GeoModelConverter
 from apptax.taxonomie.schemas import TaxrefSchema
 from utils_flask_sqla.schema import SmartRelationshipsMixin
 from marshmallow import fields, validates, ValidationError
@@ -10,15 +11,23 @@ from pypnnomenclature.utils import NomenclaturesConverter
 
 ADDITIONAL_DATA_ALLOWED_KEYS = ["collier", "taille_cm"]
 
-class IndividualSchema(SmartRelationshipsMixin, ma.SQLAlchemyAutoSchema):
+class IndividualConverter(NomenclaturesConverter, GeoModelConverter):
+    pass
+
+class IndividualSchema(SmartRelationshipsMixin, GeoAlchemyAutoSchema):
     class Meta:
         model = Individual
         include_fk = True
         load_instance = True
         sqla_session = db.session
-        model_converter = NomenclaturesConverter
+        # A initialiser seulement si plus d'un converteur, sinon avec GeoAlchemy cette variableest initialisée avec GeoConverter
+        model_converter = IndividualConverter
+        feature_id = "id_individual"  # optionnel, pour associer un id à la géométrie
+        feature_geometry = "geom_local"  # automatiquement déterminé
 
+    id_individual = ma.auto_field(dump_only=True)
     taxref = ma.Nested(TaxrefSchema)
+
 
     @validates("additional_data")
     # create an instance method that takes a value for additional_data

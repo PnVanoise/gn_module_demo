@@ -8,15 +8,34 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { IndividualService } from './services/individual.service';
 import { IndividualListComponent } from './components/individual-list/individual-list.component';
 import { IndividualDetailComponent } from './components/individual-detail/individual-detail.component';
+import { IndividualFormComponent } from './components/individual-form/individual-form.component';
 
 export const routes: Routes = [
   {
-    path: "",
-    component: IndividualListComponent,
+    path: "form",
+    children: [
+      {
+        path: "",
+        component: IndividualFormComponent,
+      },
+      {
+        path: ":id_individual",
+        component: IndividualFormComponent,
+      }
+    ]
   },
   {
-    path: ":id_individual",
-    component: IndividualDetailComponent,
+    path: "",
+    children: [
+      {
+        path: "",
+        component: IndividualListComponent,
+      },
+      {
+        path: ":id_individual",
+        component: IndividualDetailComponent,
+      }
+    ]
   },
 ];
 
@@ -34,6 +53,7 @@ export const routes: Routes = [
     // Module component
     IndividualDetailComponent,
     IndividualListComponent,
+    IndividualFormComponent
   ],
   providers: [IndividualService],
   bootstrap: [],

@@ -26,4 +26,11 @@ export class IndividualService {
       `${this._config.API_ENDPOINT}/${this._moduleService.currentModule.module_url}/indiv/${id_individual}`
     );
   }
+
+  createIndividual(individual: Omit<Individual, 'id_individual'>): Observable<Individual> {
+    return this._http.post<Individual>(
+      `${this._config.API_ENDPOINT}/${this._moduleService.currentModule.module_url}/indiv`,
+      individual
+    );
+  }
 }

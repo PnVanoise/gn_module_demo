@@ -3,5 +3,6 @@ export interface Individual {
   name: string
   id_nomenclature_sex: number
   cd_nom: number
-  additional_data: JSON
+  geom_local: GeoJSON.Geometry
+  //additional_data: JSON
 }

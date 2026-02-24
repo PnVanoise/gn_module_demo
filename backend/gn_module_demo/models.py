@@ -1,6 +1,6 @@
 from geonature.utils.env import DB
 from sqlalchemy.dialects.postgresql import JSONB
-
+from geoalchemy2 import Geometry
 from apptax.taxonomie.models import Taxref
 
 # from sqlalchemy.ext.hybrid import hybrid_property
@@ -9,7 +9,6 @@ from pypnnomenclature.models import TNomenclatures as Nomenclature
 from pypnnomenclature.utils import NomenclaturesMixin
 
 SCHEMA_NAME = "gn_demo"
-
 
 class Demo(DB.Model):
     __tablename__ = "t_demos"
@@ -21,7 +20,6 @@ class Demo(DB.Model):
         primary_key=True,
         autoincrement=True,
     )
-
 
 class Individual(NomenclaturesMixin, DB.Model):
     __tablename__ = "t_individuals"
@@ -66,3 +64,6 @@ class Individual(NomenclaturesMixin, DB.Model):
         viewonly=True,
     )
 
+    geom_local = DB.Column(
+        Geometry("GEOMETRY", 4326, nullable=True)
+    )

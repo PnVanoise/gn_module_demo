@@ -3,7 +3,7 @@
     No demo available yet.
   </div>
   <ng-template #list>
-    <a
+    <!-- <a
       class="IndivList__item"
       *ngFor="let indiv of individuals; let i = index"
       [routerLink]="[indiv.id_individual]"
@@ -11,6 +11,25 @@
     >
       <pnx-individual [individual]="indiv"></pnx-individual>
       <span class="IndivList__cta">Détails</span>
-    </a>
+    </a> -->
+    <span
+      class="IndivList__item"
+      *ngFor="let indiv of individuals; let i = index"
+
+      [ngClass]="{ 'is-odd': i % 2 === 1}"
+    >
+      <pnx-individual 
+        [individual]="indiv"
+      ></pnx-individual>
+
+      <a
+        class="IndivList__cta" 
+        [routerLink]="[indiv.id_individual]"
+      >Détails</a>
+      <a
+        class="IndivList__cta" 
+        [routerLink]="['form', indiv.id_individual]"
+      >Modifier</a>
+    </span>
   </ng-template>
 </div>
