@@ -33,8 +33,7 @@
     </span> -->
   <!-- </ng-template>
 </div> -->
-  <!-- <div *ngIf="individuals$ | async as individuals">  -->
-    <ngx-datatable
+    <!-- <ngx-datatable
       class="material striped"
       [rows]="paginatedIndividuals.items"
       [columnMode]="'force'"
@@ -48,5 +47,21 @@
       [columns]="columns"
       (page)="onPage($event)"
     >            
+    </ngx-datatable> -->
+  <div *ngIf="individuals$ | async as indivs">
+    <ngx-datatable
+      class="material striped"
+      [rows]="indivs.items"
+      [columnMode]="'force'"
+      [headerHeight]="40"
+      [footerHeight]="40"
+      [rowHeight]="44"
+      [externalPaging]="true"
+      [count]="indivs.total"
+      [limit]="indivs.limit"
+      [offset]="indivs.page - 1"
+      [columns]="columns"
+      (page)="onPage($event)"
+    >            
     </ngx-datatable>
-  <!-- </div> -->
+  </div>

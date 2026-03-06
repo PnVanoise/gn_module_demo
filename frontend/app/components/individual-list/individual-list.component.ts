@@ -21,20 +21,19 @@ import { IndividualService } from '../../services/individual.service';
   ],
 })
 export class IndividualListComponent implements OnInit {
-  // individuals: Individual[] = [];
   paginatedIndividuals: PaginatedResponse<Individual>;
-  // private _listPaginationSnapshot: PaginatedResponse<Individual> | null = null;
-  //individuals$: Observable<PaginatedResponse<Individual>>;
-  individuals$: PaginatedResponse<Individual>;
+  private _listPaginationSnapshot: PaginatedResponse<Individual> | null = null;
+  individuals$: Observable<PaginatedResponse<Individual>>;
+  //individuals$: PaginatedResponse<Individual>;
 
   params= {
     offset: 1,
     limit: 5
   }
-  // private _pagination$ = new BehaviorSubject<{ page: number; limit: number }>({
-  //   page: 1,
-  //   limit: 5,
-  // });
+  private _pagination$ = new BehaviorSubject<{ page: number; limit: number }>({
+    page: 1,
+    limit: 5,
+  });
   columns = [
     { prop: 'name', name: 'Individu' },
     { prop: 'taxref.nom_vern', name: 'Taxon' },
@@ -48,34 +47,32 @@ export class IndividualListComponent implements OnInit {
   ngOnInit() {
     console.log('Fetching individuals...');
     this.loadIndividuals();
-
   }
 
   onPage($event) {
     this.params.offset = ($event.offset ?? 0) + 1; // ngx-datatable offset est 0-based
     this.params.limit = $event.limit ?? this.params.limit;
     this.loadIndividuals(this.params.offset, this.params.limit);
-    // console.log('Page event:', $event,'limit ',this._pagination$.getValue().limit);
-    // const page = Number($event.offset ?? 0) + 1;
-    // const limit = Number($event.limit ?? this._pagination$.getValue().limit);
-    // this._pagination$.next({
-    //   page: page > 0 ? page : 1,
-    //   limit: this._pagination$.getValue().limit,
-    // });
-    // console.log('limit ',this._pagination$.getValue().limit);
+    console.log('Page event:', $event);
+    console.log('Current pagination state:', this._pagination$.getValue());
+    this._pagination$.next({
+      page: Number($event.offset ?? 0) + 1,
+      limit: Number($event.limit ?? this._pagination$.getValue().limit),
+    });
+    console.log('Next pagination state:', this._pagination$.getValue());
   }
 
-  // loadIndividuals(page = 1, limit = 5) {
-  //   this.individuals$ = this._pagination$.pipe(
-  //     switchMap(({ page, limit }) => this._individualService.getIndividuals(page, limit)),
-  //     tap((pagination) => (this._listPaginationSnapshot = pagination)),
-  //     shareReplay({ bufferSize: 1, refCount: true })
-  //   );
-  // }
   loadIndividuals(page = 1, limit = 5) {
-    this._individualService.getIndividuals(page,limit).subscribe((response: PaginatedResponse<Individual>) => {
-      this.paginatedIndividuals = response;
-      console.log('Fetched individuals:', response);
-    });
+    this.individuals$ = this._pagination$.pipe(
+      switchMap(({ page, limit }) => this._individualService.getIndividuals(page, limit)),
+      tap((pagination) => (this._listPaginationSnapshot = pagination)),
+      shareReplay({ bufferSize: 1, refCount: true })
+    );
   }
+  // loadIndividuals(page = 1, limit = 5) {
+  //   this._individualService.getIndividuals(page,limit).subscribe((response: PaginatedResponse<Individual>) => {
+  //     this.paginatedIndividuals = response;
+  //     console.log('Fetched individuals:', response);
+  //   });
+  // }
 }
