@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ConfigService } from '@geonature/services/config.service';
 import { ModuleService } from '@geonature/services/module.service';
 
 import { Individual } from '../models/individual';
+import { PaginatedResponse } from '../models/pagination';
 
 @Injectable()
 export class IndividualService {
@@ -14,10 +15,12 @@ export class IndividualService {
     private _moduleService: ModuleService
   ) {}
 
-  getIndividuals(): Observable<Individual[]> {
+  getIndividuals(page = 1, limit = 5): Observable<PaginatedResponse<Individual>> {
+    let params = new HttpParams().set('page', String(page)).set('limit', String(limit));
+
     console.log('API endpoint:', `${this._config.API_ENDPOINT}/${this._moduleService.currentModule.module_url}/indivs`);
-    return this._http.get<Individual[]>(
-      `${this._config.API_ENDPOINT}/${this._moduleService.currentModule.module_url}/indiv`,
+    return this._http.get<PaginatedResponse<Individual>>(
+      `${this._config.API_ENDPOINT}/${this._moduleService.currentModule.module_url}/indiv`, { params }
     );
   }
 
