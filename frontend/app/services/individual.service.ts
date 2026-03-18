@@ -15,8 +15,8 @@ export class IndividualService {
     private _moduleService: ModuleService
   ) {}
 
-  getIndividuals(page = 1, limit = 5): Observable<PaginatedResponse<Individual>> {
-    let params = new HttpParams().set('page', String(page)).set('limit', String(limit));
+  getIndividuals(page: number, limit: number): Observable<PaginatedResponse<Individual>> {
+    const params = new HttpParams().set('page', String(page)).set('limit', String(limit));
 
     console.log('API endpoint:', `${this._config.API_ENDPOINT}/${this._moduleService.currentModule.module_url}/indivs`);
     return this._http.get<PaginatedResponse<Individual>>(
